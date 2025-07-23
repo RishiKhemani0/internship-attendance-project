@@ -1,0 +1,120 @@
+* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #89ccff;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  display: flex;
+  width: 100%;
+  max-width: 1100px;
+  background-color: #e5f2fc;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+
+.login-box {
+  flex: 1;
+  padding: 50px;
+}
+
+.login-box h1 {
+  font-size: 36px;
+  color: #003366;
+  margin-bottom: 10px;
+}
+
+.welcome-text {
+  font-weight: 600;
+  color: #003366;
+  margin-bottom: 10px;
+}
+
+.subtext {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+.login-box form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-box label {
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.login-box input[type="text"],
+.login-box input[type="password"] {
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.options a {
+  color: #1890ff;
+  text-decoration: none;
+}
+
+button[type="submit"] {
+  background-color: #1890ff;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.register-link {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.register-link a {
+  color: #1890ff;
+  text-decoration: none;
+}
+
+.image-box {
+  flex: 1;
+  background-color: #e5f2fc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+}
+
+.image-box img {
+  max-width: 100%;
+  height: auto;
+}
+
+.group {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  align-items: center;
+}

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="login-box">
+      <h1>Punch In / Out</h1>
+      <p class="welcome-text">Welcome Back</p>
+      <p class="subtext">Please enter your Attendance credentials.</p>
+
+      <form action="login.php" method="post">
+        <label for="emp_id">Employee ID</label>
+        <input type="text" placeholder="Enter Employee ID" id="emp_id" name="emp_id" required>
+
+        <label for="password">Password</label>
+        <input type="password" placeholder="Password" required id="password" name="password">
+        <div class="group">
+          <input type="checkbox" name="showPass" id="showPass" class="inline-block">
+          <label for="showPass" class="inline-block">Show Password</label>
+        </div>
+
+        <button type="submit">Punch In / Out</button>
+      </form>
+    </div>
+
+    <div class="image-box">
+      <img src="./Images/digital-nomad-working-in-airport.png " alt="Illustration">
+    </div>
+  </div>
+
+  <script>
+    let checkShowBox = document.querySelector("#showPass");
+    let password = document.querySelector("#password");
+    checkShowBox.addEventListener('click', function() {
+      console.log("Clicked")
+      if(checkShowBox.checked) {
+        password.type = "text";
+      } else {
+        password.type = "password";
+      }
+    });
+  </script>
+</body>
+</html>
