@@ -7,25 +7,31 @@
 
 body {
   background-color: #89ccff;
-  display: flex;
   height: 100vh;
   justify-content: center;
   align-items: center;
 }
 
 .container {
-  display: flex;
   width: 100%;
-  max-width: 1100px;
-  background-color: #e5f2fc;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .login-box {
   flex: 1;
   padding: 50px;
+}
+
+.login {
+    width: 100%;
+    max-width: 1100px;
+    display: flex;
+    background-color: #e5f2fc;
+    justify-content: center;
+    align-items: center;
 }
 
 .login-box h1 {

@@ -18,6 +18,11 @@
         $emp_id = test_input($_POST["emp_id"]);
         $password = test_input($_POST["password"]);
 
+        if($emp_id == "admin" && $password == "admin") {
+            header("Location: http://localhost/internship-attendance-project/admin-dashboard/index.php");
+            exit;
+        } 
+
         $sql = "SELECT * FROM employees where employee_id='$emp_id' and password='$password'";
         $result = $conn->query($sql);
 
@@ -33,10 +38,15 @@
         
         $sql = "SELECT * FROM attendance where employee_id='$emp_id' and attendance_date='$date'";
         $result = $conn->query($sql);
+        $row = $result->fetch_assoc();
+
+        $status = $time > "13:00:00" ? "late" : "on-time";
 
         if($result->num_rows == 0) {
-            $sql = "INSERT INTO attendance(employee_id, attendance_date, `status`, in_time, out_time) VALUES ('$emp_id','$date','present','$time', 'NULL')";
+            $sql = "INSERT INTO attendance(employee_id, attendance_date, `status`, in_time, out_time) VALUES ('$emp_id','$date','$status','$time', 'NULL')";
             $status = "In";
+        } else if($row["out_time"] != "00:00:00") {
+            return;
         } else {
             $sql = "UPDATE attendance
                     SET out_time = '$time'
