@@ -1,48 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Punch In</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    * {
-      transition: 0.3s all;
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            inter: ['Inter', 'sans-serif'],
+            manrope: ['Manrope', 'sans-serif'],
+          },
+        },
+      },
     }
-  </style>
+  </script>
 </head>
-<body class="font-inter overflow-hidden">
-  <section class="flex justify-center relative">
-    <img src="https://pagedone.io/asset/uploads/1702362010.png" alt="background"
-      class="w-full h-full object-cover fixed">
-    <div class="mx-auto max-w-lg px-6 lg:px-8 absolute py-20">
-      <div class="flex justify-center items-center mb-8">
-        <img src="./images/transparent-logo.png" alt="logo" class="me-5 object-cover">
-        <p class="text-3xl font-bold text-slate-800">Attendify</p>
-      </div>
-      <div class="rounded-2xl bg-white shadow-xl w-xl ">
-        <form id="loginForm" class="lg:p-11 p-7 mx-auto" onsubmit="return handleLogin(event)">
-          <div class="mb-11">
-            <h1 class="text-gray-900 text-center font-manrope text-3xl font-bold mb-2">Punch In</h1>
-          </div>
-          <input type="text" id="emp_id"
-            class="w-full h-12 text-gray-900 placeholder:text-gray-400 text-lg rounded-full border-gray-300 border shadow-sm px-4 mb-6"
-            placeholder="Employee ID" required>
-          <button type="submit"
-            class="w-full h-12 text-white text-base font-semibold rounded-full bg-indigo-600 hover:bg-indigo-800 transition mb-11">
-            Check
-          </button>
-          </form>
-      </div>
+<body class="font-inter bg-gray-100 dark:bg-gray-900 min-h-screen flex items-center justify-center px-4">
+  <div class="w-full max-w-md bg-white dark:bg-gray-800 shadow-2xl rounded-2xl p-8 transition">
+    <div class="flex items-center justify-center mb-8">
+      <img src="./images/transparent-logo.png" alt="logo" class="h-12 me-3 object-cover">
+      <p class="text-3xl font-bold text-gray-800 dark:text-white">Attendify</p>
     </div>
-  </section>
+    <form id="loginForm" onsubmit="return handleLogin(event)">
+      <h1 class="text-center text-2xl font-bold text-gray-900 dark:text-white mb-6">Punch In</h1>
+      <input type="text" id="emp_id"
+        class="w-full h-12 px-4 mb-6 rounded-full text-gray-900 placeholder-gray-400 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-300"
+        placeholder="Employee ID" required>
+      <button type="submit"
+        class="w-full h-12 rounded-full bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition">
+        Check
+      </button>
+    </form>
+  </div>
 
   <!-- Modal -->
-  <div id="employeeModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex justify-center items-center">
-    <div class="bg-white rounded-xl p-8 w-full max-w-md">
-      <h2 class="text-2xl font-bold mb-4">Employee Details</h2>
-      <div id="employeeDetails" class="text-gray-800 space-y-2"></div>
-      <button onclick="changePage()" class="mt-6 w-full bg-sky-500 text-white py-2 rounded-lg hover:bg-gray-600">Punch-in / out</button>
-      <button onclick="closeModal()" class="mt-6 w-full bg-gray-400 text-white py-2 rounded-lg hover:bg-gray-600">Close</button>
+  <div id="employeeModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex justify-center items-center transition duration-300">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 w-full max-w-md shadow-2xl border border-gray-200 dark:border-gray-700">
+      <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white text-center">Employee Details</h2>
+      <div id="employeeDetails" class="text-gray-700 dark:text-gray-200 space-y-2 text-sm sm:text-base"></div>
+      <div class="mt-6 space-y-3">
+        <button onclick="changePage()"
+          class="w-full bg-sky-600 text-white py-2 rounded-full hover:bg-sky-700 transition">Punch In / Out</button>
+        <button onclick="closeModal()"
+          class="w-full bg-gray-400 text-white py-2 rounded-full hover:bg-gray-500 transition">Close</button>
+      </div>
     </div>
   </div>
 
@@ -50,8 +55,9 @@
     function handleLogin(event) {
       const empId = document.getElementById('emp_id').value.trim();
       event.preventDefault();
-      if(empId == "admin") {
+      if (empId === "admin") {
         window.location.href = "admin-dashboard/dashboard.php";
+        return;
       }
       if (!empId) return;
 
@@ -83,7 +89,7 @@
 
     function changePage() {
       const empId = document.getElementById('emp_id').value.trim();
-      window.location.href = "login.php?emp_id="+empId;
+      window.location.href = "login.php?emp_id=" + empId;
     }
   </script>
 </body>

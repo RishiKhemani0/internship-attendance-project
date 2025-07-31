@@ -9,11 +9,9 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch filter options
 $rolesResult = $conn->query("SELECT id, name FROM roles");
 $departmentsResult = $conn->query("SELECT department_id, dept_name FROM departments");
 
-// Filter logic
 $filters = [];
 $params = [];
 
@@ -53,155 +51,173 @@ $stmt->execute();
 $result = $stmt->get_result();
 ?>
 
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Employee Overview</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Employee Dashboard</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css"
     integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <style>
-    body {
-      background-color: #f5faff;
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
     }
-
-    .sidebar {
-      height: 100vh;
-      background-color: #ffffff;
-      padding-top: 30px;
-      border-right: 1px solid #e0e0e0;
-    }
-
-    .sidebar .nav-link {
-      color: #333;
-      padding: 12px 20px;
-    }
-
-    .sidebar .nav-link.active,
-    .sidebar .nav-link:hover {
-      background-color: #2a74f9;
-      color: #fff;
-    }
-
-    .nav-icon {
-      margin-right: 1rem;
-    }
-  </style>
+  </script>
 </head>
 
-<body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container-fluid">
-      <a class="navbar-brand d-flex align-items-center gap-2" href="#">
-        <img src="../images/Logo.png" alt="Attentify Logo">
-        <span class="fw-bold">Attentify</span>
-      </a>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans transition-all duration-300">
+
+  <!-- Navbar -->
+  <!-- Navbar -->
+  <nav class="bg-white dark:bg-gray-800 shadow-md border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+    <div class="max-w-full flex justify-between items-center">
+
+      <!-- Left: Logo + Title -->
+      <div class="flex items-center space-x-3">
+        <img src="../images/transparent-logo.png" alt="Logo" class="w-8 h-8" />
+        <span class="text-xl font-semibold text-gray-800 dark:text-white">Attentify Dashboard</span>
+      </div>
+
+      <!-- Middle: Search Form -->
+      <form method="GET" class="hidden md:block w-1/3">
+        <input type="text" name="search_emp_id"
+          value="<?= isset($_GET['search_emp_id']) ? htmlspecialchars($_GET['search_emp_id']) : '' ?>"
+          placeholder="Search by Employee ID..."
+          class="w-full px-4 py-2 rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white text-sm border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      </form>
+
+
+      <!-- Right: Controls -->
+      <div class="flex items-center gap-4">
+        <!-- Dark Mode Toggle -->
+        <button onclick="document.documentElement.classList.toggle('dark')" title="Toggle Dark Mode"
+          class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 3v1m0 16v1m8.66-8.66h1M3.34 12H2.34m15.36 4.24l.71.71M6.34 6.34l-.71-.71m12.02-.02l-.71.71M6.34 17.66l.71-.71M21 12a9 9 0 11-9-9c.34 0 .68.02 1.01.06a7 7 0 008.93 8.94c.04.33.06.67.06 1z" />
+          </svg>
+        </button>
+
+        <!-- Profile Icon (placeholder) -->
+        <div
+          class="w-9 h-9 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-700 dark:text-white">
+          <i class="fa-solid fa-user text-sm"></i>
+        </div>
+      </div>
+
     </div>
   </nav>
 
-  <div class="container-fluid">
-    <div class="row">
-      <nav class="col-md-2 d-md-block sidebar">
-        <ul class="nav flex-column">
-          <li class="nav-item">
-            <a class="nav-link" href="./reports.php"><i class="fa-solid nav-icon fa-chart-simple"></i>Attendance
-              Report</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" href="./dashboard.php"><i class="fa-solid nav-icon fa-tablet"></i>Dashboard</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#"><i class="fa-solid nav-icon fa-user"></i>Company Info</a>
-          </li>
-        </ul>
-      </nav>
 
-      <main class="col-md-10 ms-sm-auto px-md-4 py-4">
-        <h3 class="mb-4">Employee Overview</h3>
+  <div class="flex">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white dark:bg-gray-800 p-6 shadow-md hidden md:block min-h-screen">
+      <ul class="space-y-3">
+        <li><a href="./reports.php" class="block px-4 py-2 rounded hover:bg-blue-100 dark:hover:bg-blue-900"><i
+              class="fa-solid nav-icon fa-chart-simple"></i> Attendance Report</a></li>
+        <li><a href="./dashboard.php" class="block px-4 py-2 rounded bg-blue-100 dark:bg-blue-900 font-semibold"><i
+              class="fa-solid nav-icon fa-tablet"></i> Dashboard</a></li>
+        <li><a href="#" class="block px-4 py-2 rounded hover:bg-blue-100 dark:hover:bg-blue-900"><i
+              class="fa-solid fa-user"></i> Company Info</a></li>
+      </ul>
+    </aside>
 
-        <form class="row g-3 mb-4" method="GET">
-          <div class="col-md-3">
-            <label for="role" class="form-label">Filter by Role</label>
-            <select name="role" id="role" class="form-select">
-              <option value="">All Roles</option>
-              <?php while ($role = $rolesResult->fetch_assoc()) {
-                $selected = isset($_GET['role']) && $_GET['role'] == $role['id'] ? 'selected' : '';
-                echo "<option value='{$role['id']}' $selected>{$role['name']}</option>";
-              } ?>
-            </select>
-          </div>
+    <!-- Main Content -->
+    <main class="flex-1 p-6">
+      <h1 class="text-2xl font-semibold mb-6">Employee Overview</h1>
 
-          <div class="col-md-3">
-            <label for="department" class="form-label">Filter by Department</label>
-            <select name="department" id="department" class="form-select">
-              <option value="">All Departments</option>
-              <?php while ($dept = $departmentsResult->fetch_assoc()) {
-                $selected = isset($_GET['department']) && $_GET['department'] == $dept['department_id'] ? 'selected' : '';
-                echo "<option value='{$dept['department_id']}' $selected>{$dept['dept_name']}</option>";
-              } ?>
-            </select>
-          </div>
-
-          <div class="col-md-3">
-            <label for="gender" class="form-label">Filter by Gender</label>
-            <select name="gender" id="gender" class="form-select">
-              <option value="">All Genders</option>
-              <option value="Male" <?= (isset($_GET['gender']) && $_GET['gender'] == 'Male') ? 'selected' : '' ?>>Male
-              </option>
-              <option value="Female" <?= (isset($_GET['gender']) && $_GET['gender'] == 'Female') ? 'selected' : '' ?>>
-                Female</option>
-              <option value="Other" <?= (isset($_GET['gender']) && $_GET['gender'] == 'Other') ? 'selected' : '' ?>>Other
-              </option>
-            </select>
-          </div>
-
-          <div class="col-md-3">
-            <label for="search_emp_id" class="form-label">Search by Employee ID</label>
-            <input type="text" name="search_emp_id" id="search_emp_id" class="form-control"
-              value="<?= isset($_GET['search_emp_id']) ? htmlspecialchars($_GET['search_emp_id']) : '' ?>">
-          </div>
-
-          <div class="col-md-12 d-flex justify-content-end">
-            <button type="submit" class="btn btn-primary">Apply Filters</button>
-            <a href="dashboard.php" class="btn btn-secondary ms-2">Reset</a>
-          </div>
-        </form>
-
-
-        <div class="table-responsive">
-          <table class="table table-bordered align-middle" id="employee-table">
-            <thead class="table-light">
-              <tr>
-                <th>Employee ID</th>
-                <th>Name</th>
-                <th>Role</th>
-                <th>Salary</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php
-              while ($row = $result->fetch_assoc()) {
-                echo "<tr onclick=\"window.location.href='table.php?employee_id=" . $row["employee_id"] . "'\" style='cursor:pointer'>";
-                echo "<td>" . htmlspecialchars($row["employee_id"]) . "</td>";
-                echo "<td>" . htmlspecialchars($row["full_name"]) . "</td>";
-                echo "<td>" . htmlspecialchars($row["role"]) . "</td>";
-                echo "<td>₹" . number_format($row["salary"]) . "</td>";
-                echo "</tr>";
-              }
-              ?>
-            </tbody>
-          </table>
+      <!-- Filters -->
+      <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div>
+          <label for="role" class="block mb-1 font-medium">Role</label>
+          <select name="role" id="role" class="w-full px-3 py-2 rounded border dark:bg-gray-700 dark:border-gray-600">
+            <option value="">All Roles</option>
+            <?php while ($role = $rolesResult->fetch_assoc()) {
+              $selected = isset($_GET['role']) && $_GET['role'] == $role['id'] ? 'selected' : '';
+              echo "<option value='{$role['id']}' $selected>{$role['name']}</option>";
+            } ?>
+          </select>
         </div>
+        <div>
+          <label for="department" class="block mb-1 font-medium">Department</label>
+          <select name="department" id="department"
+            class="w-full px-3 py-2 rounded border dark:bg-gray-700 dark:border-gray-600">
+            <option value="">All Departments</option>
+            <?php while ($dept = $departmentsResult->fetch_assoc()) {
+              $selected = isset($_GET['department']) && $_GET['department'] == $dept['department_id'] ? 'selected' : '';
+              echo "<option value='{$dept['department_id']}' $selected>{$dept['dept_name']}</option>";
+            } ?>
+          </select>
+        </div>
+        <div>
+          <label for="gender" class="block mb-1 font-medium">Gender</label>
+          <select name="gender" id="gender"
+            class="w-full px-3 py-2 rounded border dark:bg-gray-700 dark:border-gray-600">
+            <option value="">All Genders</option>
+            <option value="Male" <?= (isset($_GET['gender']) && $_GET['gender'] == 'Male') ? 'selected' : '' ?>>Male
+            </option>
+            <option value="Female" <?= (isset($_GET['gender']) && $_GET['gender'] == 'Female') ? 'selected' : '' ?>>Female
+            </option>
+            <option value="Other" <?= (isset($_GET['gender']) && $_GET['gender'] == 'Other') ? 'selected' : '' ?>>Other
+            </option>
+          </select>
+        </div>
+        <div>
+          <label for="search_emp_id" class="block mb-1 font-medium">Employee ID</label>
+          <input type="text" name="search_emp_id" id="search_emp_id"
+            class="w-full px-3 py-2 rounded border dark:bg-gray-700 dark:border-gray-600"
+            value="<?= isset($_GET['search_emp_id']) ? htmlspecialchars($_GET['search_emp_id']) : '' ?>">
+        </div>
+        <div class="md:col-span-4 flex justify-end gap-3 mt-2">
+          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Apply
+            Filters</button>
+          <a href="dashboard.php"
+            class="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-700">Reset</a>
+        </div>
+      </form>
 
-      </main>
-    </div>
+      <!-- Employee Table -->
+      <div class="overflow-auto rounded shadow-md">
+        <table class="min-w-full table-auto border-collapse">
+          <thead class="bg-gray-200 dark:bg-gray-700 text-left">
+            <tr>
+              <th class="px-4 py-3">#</th>
+              <th class="px-4 py-3">Employee ID</th>
+              <th class="px-4 py-3">Name</th>
+              <th class="px-4 py-3">Role</th>
+              <th class="px-4 py-3">Salary</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white dark:bg-gray-800">
+            <?php
+            $i = 1;
+            while ($row = $result->fetch_assoc()) {
+              $role = htmlspecialchars($row["role"]);
+              $empId = htmlspecialchars($row["employee_id"]);
+              $name = htmlspecialchars($row["full_name"]);
+              $salary = number_format($row["salary"]);
+              $salaryClass = $row["salary"] > 50000 ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+
+              echo "<tr onclick=\"window.location.href='table.php?employee_id={$empId}'\" class='hover:bg-blue-50 dark:hover:bg-gray-700 cursor-pointer transition'>";
+              echo "<td class='px-4 py-3'>{$i}</td>";
+              echo "<td class='px-4 py-3'>{$empId}</td>";
+              echo "<td class='px-4 py-3'>{$name}</td>";
+              echo "<td class='px-4 py-3'><span class='px-2 py-1 text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded'>{$role}</span></td>";
+              echo "<td class='px-4 py-3'><span class='px-2 py-1 text-sm font-medium rounded {$salaryClass}'>₹{$salary}</span></td>";
+              echo "</tr>";
+              $i++;
+            }
+            ?>
+          </tbody>
+        </table>
+      </div>
+    </main>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

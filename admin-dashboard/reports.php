@@ -52,135 +52,105 @@ while ($row = $monthlyResult->fetch_assoc()) {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Attendance Reports</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <style>
-    .chart-container {
-      margin: 40px auto;
-      max-width: 900px;
-    }
-
-    body {
-      background-color: #f5faff;
-    }
-
-    .sidebar {
-      height: 100vh;
-      background-color: #ffffff;
-      padding-top: 30px;
-      border-right: 1px solid #e0e0e0;
-    }
-
-    .sidebar .nav-link {
-      color: #333;
-      padding: 12px 20px;
-    }
-
-    .nav-icon {
-      margin-right: 1rem;
-    }
-
-    .sidebar .nav-link.active,
-    .sidebar .nav-link:hover {
-      background-color: #2a74f9;
-      color: #fff;
-    }
-
-    .table-status {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      margin-right: 6px;
-      vertical-align: middle;
-    }
-
-    .on-time {
-      background-color: green;
-    }
-
-    .late {
-      background-color: orange;
-    }
-
-    .search-box {
-      max-width: 200px;
-    }
-
-    .legend span {
-      margin-right: 20px;
-    }
-
-    .main-content {
-      margin-left: 1rem;
-      padding: 20px;
-    }
-  </style>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    };
+  </script>
 </head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans transition-all duration-300">
 
-<body>
-
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container-fluid">
-      <a class="navbar-brand d-flex align-items-center gap-2" href="#">
-        <img src="../images/Logo.png" alt="Attentify Logo">
-        <span class="fw-bold">Attentify</span>
-      </a>
+  <!-- Navbar -->
+  <nav class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-md px-6 py-4">
+    <div class="max-w-full flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <img src="../images/transparent-logo.png" alt="Logo" class="w-8 h-8" />
+        <span class="text-xl font-semibold text-gray-800 dark:text-white">Attentify Reports</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <button onclick="document.documentElement.classList.toggle('dark')" title="Toggle Dark Mode"
+          class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 3v1m0 16v1m8.66-8.66h1M3.34 12H2.34m15.36 4.24l.71.71M6.34 6.34l-.71-.71m12.02-.02l-.71.71M6.34 17.66l.71-.71M21 12a9 9 0 11-9-9c.34 0 .68.02 1.01.06a7 7 0 008.93 8.94c.04.33.06.67.06 1z" />
+          </svg>
+        </button>
+        <a href="./register_employee/register.php" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded shadow text-sm font-medium">
+          + Add Employee
+        </a>
+      </div>
     </div>
   </nav>
 
-  <div class="container-fluid">
-    <div class="row">
-      <nav class="col-md-2 d-md-block sidebar">
-        <ul class="nav flex-column">
-          <li class="nav-item">
-            <a class="nav-link active" href="./reports.php"><i class="fa-solid nav-icon fa-chart-simple"></i>Attendance Report</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="./dashboard.php"><i class="fa-solid nav-icon fa-tablet"></i>Dashboard</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#"><i class="fa-solid nav-icon fa-user"></i>Company Info</a>
-          </li>
-        </ul>
-      </nav>
+  <div class="flex">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white dark:bg-gray-800 p-6 border-r border-gray-200 dark:border-gray-700 hidden md:block">
+      <ul class="space-y-4">
+        <li><a href="./reports.php" class="block px-4 py-2 rounded bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 font-medium"><i class="fa-solid nav-icon fa-chart-simple"></i> Attendance Report</a></li>
+        <li><a href="./dashboard.php" class="block px-4 py-2 rounded hover:bg-blue-50 dark:hover:bg-gray-700"><i class="fa-solid nav-icon fa-tablet"></i> Dashboard</a></li>
+        <li><a href="#" class="block px-4 py-2 rounded hover:bg-blue-50 dark:hover:bg-gray-700"><i class="fa-solid nav-icon fa-user"></i> Company Info</a></li>
+      </ul>
+    </aside>
 
-      <div class="col-md-10">
-        <div class="main-content">
-          <<div class="container mt-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <h2 class="mb-0"><i class="fa-solid fa-chart-simple"></i> Attendance Reports</h2>
-              <a href="./register_employee/register.php" class="btn btn-success"> Add Employee</a>
-            </div>
+    <!-- Main Content -->
+    <main class="flex-1 p-6 overflow-auto">
+      <h2 class="text-2xl font-semibold mb-6">📊 Attendance Reports</h2>
 
-            <div class="chart-container">
-              <h5>Daily On-Time vs Late Attendance</h5>
-              <canvas id="lineChart"></canvas>
-            </div>
+      <!-- Date Filter -->
+      <div class="mb-6">
+        <label for="filterDate" class="block mb-2 font-medium">Filter by Date:</label>
+        <input type="date" id="filterDate" class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded px-4 py-2" />
+      </div>
 
-            <div class="chart-container">
-              <h5>Monthly Presence Percentage</h5>
-              <canvas id="monthlyChart"></canvas>
-            </div>
+      <!-- Summary Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white dark:bg-gray-800 shadow rounded p-4">
+          <div class="text-gray-500 dark:text-gray-400 text-sm">Total Days</div>
+          <div class="text-xl font-semibold"><?= count($dates) ?></div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 shadow rounded p-4">
+          <div class="text-gray-500 dark:text-gray-400 text-sm">Total On-Time Entries</div>
+          <div class="text-xl font-semibold"><?= array_sum($onTimeData) ?></div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 shadow rounded p-4">
+          <div class="text-gray-500 dark:text-gray-400 text-sm">Total Late Entries</div>
+          <div class="text-xl font-semibold"><?= array_sum($lateData) ?></div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 shadow rounded p-4">
+          <div class="text-gray-500 dark:text-gray-400 text-sm">Months Recorded</div>
+          <div class="text-xl font-semibold"><?= count($months) ?></div>
         </div>
       </div>
-    </div>
-  </div>
+
+      <!-- Line Chart -->
+      <div class="bg-white dark:bg-gray-800 rounded shadow p-6 mb-8">
+        <h3 class="text-lg font-semibold mb-4">Daily On-Time vs Late Attendance</h3>
+        <canvas id="lineChart" height="100"></canvas>
+      </div>
+
+      <!-- Bar Chart -->
+      <div class="bg-white dark:bg-gray-800 rounded shadow p-6">
+        <h3 class="text-lg font-semibold mb-4">Monthly Presence Percentage</h3>
+        <canvas id="monthlyChart" height="100"></canvas>
+      </div>
+    </main>
   </div>
 
   <script>
-    const dates = <?php echo json_encode($dates); ?>;
-    const onTime = <?php echo json_encode($onTimeData); ?>;
-    const late = <?php echo json_encode($lateData); ?>;
-    const months = <?php echo json_encode($months); ?>;
-    const monthlyPercentages = <?php echo json_encode($monthlyPercentages); ?>;
+    const dates = <?= json_encode($dates); ?>;
+    const onTime = <?= json_encode($onTimeData); ?>;
+    const late = <?= json_encode($lateData); ?>;
+    const months = <?= json_encode($months); ?>;
+    const monthlyPercentages = <?= json_encode($monthlyPercentages); ?>;
 
     new Chart(document.getElementById("lineChart"), {
       type: "line",
@@ -192,40 +162,38 @@ while ($row = $monthlyResult->fetch_assoc()) {
             data: onTime,
             borderColor: "green",
             backgroundColor: "rgba(0, 128, 0, 0.2)",
-            tension: 0.4
+            tension: 0.4,
           },
           {
             label: "Late",
             data: late,
             borderColor: "orange",
             backgroundColor: "rgba(255, 165, 0, 0.2)",
-            tension: 0.4
-          }
-        ]
+            tension: 0.4,
+          },
+        ],
       },
       options: {
         responsive: true,
         plugins: {
           legend: {
-            position: 'top'
+            position: "top",
           },
-          title: {
-            display: true,
-            text: 'On-Time vs Late per Date'
-          }
-        }
-      }
+        },
+      },
     });
 
     new Chart(document.getElementById("monthlyChart"), {
       type: "bar",
       data: {
         labels: months,
-        datasets: [{
-          label: "% Present",
-          data: monthlyPercentages,
-          backgroundColor: "#2a74f9"
-        }]
+        datasets: [
+          {
+            label: "% Present",
+            data: monthlyPercentages,
+            backgroundColor: "#2a74f9",
+          },
+        ],
       },
       options: {
         responsive: true,
@@ -235,19 +203,12 @@ while ($row = $monthlyResult->fetch_assoc()) {
             max: 100,
             title: {
               display: true,
-              text: 'Percentage Present'
-            }
-          }
+              text: "Percentage Present",
+            },
+          },
         },
-        plugins: {
-          title: {
-            display: true,
-            text: 'Monthly Employee Presence Percentage'
-          }
-        }
-      }
+      },
     });
   </script>
 </body>
-
 </html>

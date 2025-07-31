@@ -92,119 +92,141 @@ $stmt->bind_param("sssssssiiissi",
 <head>
   <meta charset="UTF-8">
   <title>Edit Employee</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container-fluid">
-      <a class="navbar-brand d-flex align-items-center gap-2" href="#">
-        <img src="../../images/Logo.png" alt="Attentify Logo" class="d-inline-block align-text-top">
-        <span class="fw-bold">Attentify</span>
-      </a>
+<nav class="bg-white dark:bg-gray-800 shadow-md border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+  <div class="max-w-full flex justify-between items-center">
+    
+    <!-- Left: Logo + Title -->
+    <div class="flex items-center space-x-3">
+      <img src="../../images/transparent-logo.png" alt="Logo" class="w-8 h-8" />
+      <span class="text-xl font-semibold text-gray-800 dark:text-white">Attentify Dashboard</span>
     </div>
-  </nav>
 
-  <!-- Edit Form -->
-  <div class="container my-5">
-    <div class="row justify-content-center">
-      <div class="col-lg-10 col-md-12">
-        <div class="card shadow p-4">
-          <h2 class="mb-3 text-center">Edit Employee</h2>
-          <form action="" method="post">
-            <div class="row g-3">
-              <div class="col-md-4">
-                <label class="form-label">First Name</label>
-                <input type="text" class="form-control" name="first_name" value="<?= htmlspecialchars($employee['first_name']) ?>" required>
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">Middle Name</label>
-                <input type="text" class="form-control" name="middle_name" value="<?= htmlspecialchars($employee['middle_name']) ?>">
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">Last Name</label>
-                <input type="text" class="form-control" name="last_name" value="<?= htmlspecialchars($employee['last_name']) ?>" required>
-              </div>
+    <!-- Right: Controls -->
+    <div class="flex items-center gap-4">
+      <!-- Dark Mode Toggle -->
+      <button onclick="document.documentElement.classList.toggle('dark')" title="Toggle Dark Mode"
+        class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 3v1m0 16v1m8.66-8.66h1M3.34 12H2.34m15.36 4.24l.71.71M6.34 6.34l-.71-.71m12.02-.02l-.71.71M6.34 17.66l.71-.71M21 12a9 9 0 11-9-9c.34 0 .68.02 1.01.06a7 7 0 008.93 8.94c.04.33.06.67.06 1z" />
+        </svg>
+      </button>
 
-              <div class="col-md-6">
-                <label class="form-label">Email</label>
-                <input type="email" class="form-control" name="email" value="<?= htmlspecialchars($employee['email']) ?>" required>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Phone Number</label>
-                <input type="tel" class="form-control" name="phone_num" value="<?= htmlspecialchars($employee['phone_num']) ?>" required>
-              </div>
-
-              <div class="col-md-6">
-                <label class="form-label">Birth Date</label>
-                <input type="date" class="form-control" name="birth_date" value="<?= $employee['birth_date'] ?>" required>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Hire Date</label>
-                <input type="date" class="form-control" name="hire_date" value="<?= $employee['hire_date'] ?>" required>
-              </div>
-
-              <div class="col-md-4">
-                <label class="form-label">Salary</label>
-                <input type="number" class="form-control" name="salary" value="<?= $employee['salary'] ?>" required>
-              </div>
-
-              <div class="col-md-4">
-                <label class="form-label">Role</label>
-                <select class="form-select" name="role" required>
-                  <option value="">Select Role</option>
-                  <?php foreach ($roles as $role): ?>
-                    <option value="<?= $role['id'] ?>" <?= ($employee['role'] == $role['id']) ? "selected" : "" ?>>
-                      <?= htmlspecialchars($role['name']) ?>
-                    </option>
-                  <?php endforeach; ?>
-                </select>
-              </div>
-
-              <div class="col-md-4">
-                <label class="form-label">Department</label>
-                <select class="form-select" name="department" required>
-                  <option value="">Select Department</option>
-                  <?php foreach ($departments as $dept): ?>
-                    <option value="<?= $dept['department_id'] ?>" <?= ($employee['department_id'] == $dept['department_id']) ? "selected" : "" ?>>
-                      <?= htmlspecialchars($dept['dept_name']) ?>
-                    </option>
-                  <?php endforeach; ?>
-                </select>
-              </div>
-
-              <div class="col-md-6">
-                <label class="form-label">Gender</label>
-                <select class="form-select" name="gender" required>
-                  <option value="">Select Gender</option>
-                  <option <?= ($employee['gender'] == "Male") ? "selected" : "" ?>>Male</option>
-                  <option <?= ($employee['gender'] == "Female") ? "selected" : "" ?>>Female</option>
-                  <option <?= ($employee['gender'] == "Other") ? "selected" : "" ?>>Other</option>
-                </select>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Password</label>
-                <input type="password" class="form-control" name="password" value="<?= htmlspecialchars($employee['password']) ?>" id="password" required>
-              </div>
-
-              <div class="col-12">
-                <div class="form-check">
-                  <input type="checkbox" class="form-check-input" id="showPass">
-                  <label class="form-check-label" for="showPass">Show Password</label>
-                </div>
-              </div>
-
-              <div class="col-12 text-center mt-3">
-                <button type="submit" class="btn btn-success px-5">Update</button>
-                <a href="dashboard.php" class="btn btn-secondary ms-2">Cancel</a>
-              </div>
-            </div>
-          </form>
-        </div>
+      <!-- Profile Icon (placeholder) -->
+      <div class="w-9 h-9 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-700 dark:text-white">
+        <i class="fa-solid fa-user text-sm"></i>
       </div>
     </div>
+
   </div>
+</nav>
+
+  <!-- Edit Form -->
+  <!-- Edit Form -->
+<div class="max-w-5xl mx-auto p-6 mt-10 bg-white dark:bg-gray-800 shadow-md rounded-lg">
+  <h2 class="text-2xl font-bold mb-6 text-center">Edit Employee</h2>
+  <form action="" method="post" class="space-y-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>
+        <label class="block text-sm font-medium mb-1">First Name</label>
+        <input type="text" name="first_name" value="<?= htmlspecialchars($employee['first_name']) ?>" required
+          class="w-full px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring focus:ring-blue-500">
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Middle Name</label>
+        <input type="text" name="middle_name" value="<?= htmlspecialchars($employee['middle_name']) ?>"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring focus:ring-blue-500">
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Last Name</label>
+        <input type="text" name="last_name" value="<?= htmlspecialchars($employee['last_name']) ?>" required
+          class="w-full px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring focus:ring-blue-500">
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium mb-1">Email</label>
+        <input type="email" name="email" value="<?= htmlspecialchars($employee['email']) ?>" required
+          class="w-full px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring focus:ring-blue-500">
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Phone Number</label>
+        <input type="tel" name="phone_num" value="<?= htmlspecialchars($employee['phone_num']) ?>" required
+          class="w-full px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring focus:ring-blue-500">
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium mb-1">Birth Date</label>
+        <input type="date" name="birth_date" value="<?= $employee['birth_date'] ?>" required
+          class="w-full px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring focus:ring-blue-500">
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Hire Date</label>
+        <input type="date" name="hire_date" value="<?= $employee['hire_date'] ?>" required
+          class="w-full px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring focus:ring-blue-500">
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>
+        <label class="block text-sm font-medium mb-1">Salary</label>
+        <input type="number" name="salary" value="<?= $employee['salary'] ?>" required
+          class="w-full px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring focus:ring-blue-500">
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Role</label>
+        <select name="role" required
+          class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring focus:ring-blue-500">
+          <option value="">Select Role</option>
+          <?php foreach ($roles as $role): ?>
+          <option value="<?= $role['id'] ?>" <?= ($employee['role'] == $role['id']) ? "selected" : "" ?>>
+            <?= htmlspecialchars($role['name']) ?>
+          </option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Department</label>
+        <select name="department" required
+          class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring focus:ring-blue-500">
+          <option value="">Select Department</option>
+          <?php foreach ($departments as $dept): ?>
+          <option value="<?= $dept['department_id'] ?>" <?= ($employee['department_id'] == $dept['department_id']) ? "selected" : "" ?>>
+            <?= htmlspecialchars($dept['dept_name']) ?>
+          </option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+    </div>
+
+    <div class="w-full md:w-1/2">
+      <label class="block text-sm font-medium mb-1">Gender</label>
+      <select name="gender" required
+        class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring focus:ring-blue-500">
+        <option value="">Select Gender</option>
+        <option <?= ($employee['gender'] == "Male") ? "selected" : "" ?>>Male</option>
+        <option <?= ($employee['gender'] == "Female") ? "selected" : "" ?>>Female</option>
+        <option <?= ($employee['gender'] == "Other") ? "selected" : "" ?>>Other</option>
+      </select>
+    </div>
+
+    <div class="text-center pt-6">
+      <button type="submit"
+        class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">Update</button>
+      <a href="dashboard.php"
+        class="ml-3 px-6 py-2 border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-white rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition">Cancel</a>
+    </div>
+  </form>
+</div>
+
 
   <script>
     const checkShowBox = document.querySelector("#showPass");
