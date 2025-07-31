@@ -144,9 +144,6 @@ while ($row = $monthlyResult->fetch_assoc()) {
             <a class="nav-link active" href="./reports.php"><i class="fa-solid nav-icon fa-chart-simple"></i>Attendance Report</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="./index.php"><i class="fa-solid fa-clock nav-icon"></i></i>Attendance Log</a>
-          </li>
-          <li class="nav-item">
             <a class="nav-link" href="./dashboard.php"><i class="fa-solid nav-icon fa-tablet"></i>Dashboard</a>
           </li>
           <li class="nav-item">

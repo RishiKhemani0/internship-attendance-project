@@ -4,18 +4,55 @@ $username = "root";
 $password = "";
 $dbname = "attendance-db";
 
-// Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch employee info
-    $sql = "SELECT e.employee_id, CONCAT(e.first_name, ' ', e.middle_name, ' ', e.last_name) AS full_name, r.name AS role, e.salary
-            FROM employees e
-            JOIN roles r ON e.role = r.id";
-$result = $conn->query($sql);
+// Fetch filter options
+$rolesResult = $conn->query("SELECT id, name FROM roles");
+$departmentsResult = $conn->query("SELECT department_id, dept_name FROM departments");
+
+// Filter logic
+$filters = [];
+$params = [];
+
+if (!empty($_GET['role'])) {
+  $filters[] = 'e.role = ?';
+  $params[] = $_GET['role'];
+}
+if (!empty($_GET['department'])) {
+  $filters[] = 'e.department_id = ?';
+  $params[] = $_GET['department'];
+}
+if (!empty($_GET['gender'])) {
+  $filters[] = 'e.gender = ?';
+  $params[] = $_GET['gender'];
+}
+if (!empty($_GET['search_emp_id'])) {
+  $filters[] = 'e.employee_id = ?';
+  $params[] = $_GET['search_emp_id'];
+}
+
+$sql = "SELECT e.employee_id, CONCAT(e.first_name, ' ', e.middle_name, ' ', e.last_name) AS full_name, r.name AS role, e.salary
+        FROM employees e
+        JOIN roles r ON e.role = r.id";
+
+if (!empty($filters)) {
+  $sql .= " WHERE " . implode(" AND ", $filters);
+}
+
+$stmt = $conn->prepare($sql);
+
+if (!empty($filters)) {
+  $types = str_repeat("s", count($params));
+  $stmt->bind_param($types, ...$params);
+}
+
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -72,10 +109,8 @@ $result = $conn->query($sql);
       <nav class="col-md-2 d-md-block sidebar">
         <ul class="nav flex-column">
           <li class="nav-item">
-            <a class="nav-link" href="./reports.php"><i class="fa-solid nav-icon fa-chart-simple"></i>Attendance Report</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="./index.php"><i class="fa-solid fa-clock nav-icon"></i>Attendance Log</a>
+            <a class="nav-link" href="./reports.php"><i class="fa-solid nav-icon fa-chart-simple"></i>Attendance
+              Report</a>
           </li>
           <li class="nav-item">
             <a class="nav-link active" href="./dashboard.php"><i class="fa-solid nav-icon fa-tablet"></i>Dashboard</a>
@@ -88,6 +123,55 @@ $result = $conn->query($sql);
 
       <main class="col-md-10 ms-sm-auto px-md-4 py-4">
         <h3 class="mb-4">Employee Overview</h3>
+
+        <form class="row g-3 mb-4" method="GET">
+          <div class="col-md-3">
+            <label for="role" class="form-label">Filter by Role</label>
+            <select name="role" id="role" class="form-select">
+              <option value="">All Roles</option>
+              <?php while ($role = $rolesResult->fetch_assoc()) {
+                $selected = isset($_GET['role']) && $_GET['role'] == $role['id'] ? 'selected' : '';
+                echo "<option value='{$role['id']}' $selected>{$role['name']}</option>";
+              } ?>
+            </select>
+          </div>
+
+          <div class="col-md-3">
+            <label for="department" class="form-label">Filter by Department</label>
+            <select name="department" id="department" class="form-select">
+              <option value="">All Departments</option>
+              <?php while ($dept = $departmentsResult->fetch_assoc()) {
+                $selected = isset($_GET['department']) && $_GET['department'] == $dept['department_id'] ? 'selected' : '';
+                echo "<option value='{$dept['department_id']}' $selected>{$dept['dept_name']}</option>";
+              } ?>
+            </select>
+          </div>
+
+          <div class="col-md-3">
+            <label for="gender" class="form-label">Filter by Gender</label>
+            <select name="gender" id="gender" class="form-select">
+              <option value="">All Genders</option>
+              <option value="Male" <?= (isset($_GET['gender']) && $_GET['gender'] == 'Male') ? 'selected' : '' ?>>Male
+              </option>
+              <option value="Female" <?= (isset($_GET['gender']) && $_GET['gender'] == 'Female') ? 'selected' : '' ?>>
+                Female</option>
+              <option value="Other" <?= (isset($_GET['gender']) && $_GET['gender'] == 'Other') ? 'selected' : '' ?>>Other
+              </option>
+            </select>
+          </div>
+
+          <div class="col-md-3">
+            <label for="search_emp_id" class="form-label">Search by Employee ID</label>
+            <input type="text" name="search_emp_id" id="search_emp_id" class="form-control"
+              value="<?= isset($_GET['search_emp_id']) ? htmlspecialchars($_GET['search_emp_id']) : '' ?>">
+          </div>
+
+          <div class="col-md-12 d-flex justify-content-end">
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+            <a href="dashboard.php" class="btn btn-secondary ms-2">Reset</a>
+          </div>
+        </form>
+
 
         <div class="table-responsive">
           <table class="table table-bordered align-middle" id="employee-table">
