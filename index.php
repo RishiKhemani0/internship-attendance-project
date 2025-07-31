@@ -51,7 +51,7 @@
         <h1 class="text-center text-2xl font-bold text-gray-900 dark:text-white mb-6">Punch In</h1>
         <input type="text" id="emp_id"
           class="w-full h-12 px-4 mb-6 rounded-full text-gray-900 placeholder-gray-400 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-300"
-          placeholder="Employee ID" required>
+          placeholder="Employee ID" required autofocus>
         <button type="submit"
           class="w-full h-12 rounded-full bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition">
           Check
@@ -69,7 +69,8 @@
       <div id="employeeDetails" class="text-gray-700 dark:text-gray-200 space-y-2 text-sm sm:text-base"></div>
       <div class="mt-6 space-y-3">
         <button onclick="changePage()"
-          class="w-full bg-sky-600 text-white py-2 rounded-full hover:bg-sky-700 transition">Punch In / Out</button>
+          class="w-full bg-sky-600 text-white py-2 rounded-full hover:bg-sky-700 transition">Punch <span
+            id="status"></span></button>
         <button onclick="closeModal()"
           class="w-full bg-gray-400 text-white py-2 rounded-full hover:bg-gray-500 transition">Close</button>
       </div>
@@ -78,8 +79,9 @@
 
   <script>
     function handleLogin(event) {
-      const empId = document.getElementById('emp_id').value.trim();
       event.preventDefault();
+      const empId = document.getElementById('emp_id').value.trim();
+
       if (empId === "admin") {
         window.location.href = "admin-dashboard/dashboard.php";
         return;
@@ -91,13 +93,21 @@
         .then(data => {
           if (data && data.employee_id) {
             document.getElementById('employeeDetails').innerHTML = `
-              <p><strong>ID:</strong> ${data.employee_id}</p>
-              <p><strong>Name:</strong> ${data.first_name} ${data.middle_name || ''} ${data.last_name}</p>
-              <p><strong>Role:</strong> ${data.role}</p>
-              <p><strong>Email:</strong> ${data.email}</p>
-              <p><strong>Phone:</strong> ${data.phone_num}</p>
-            `;
-            document.getElementById('employeeModal').classList.remove('hidden');
+          <p><strong>ID:</strong> ${data.employee_id}</p>
+          <p><strong>Name:</strong> ${data.first_name} ${data.middle_name || ''} ${data.last_name}</p>
+          <p><strong>Role:</strong> ${data.role}</p>
+          <p><strong>Email:</strong> ${data.email}</p>
+          <p><strong>Phone:</strong> ${data.phone_num}</p>
+          <p><strong>Today's In Time:</strong> ${data.in_time ? data.in_time : 'Not yet punched in'}</p>
+        `;
+            document.getElementById('status').textContent = data.in_time ? 'Out' : 'In';
+
+            // Show modal
+            const modal = document.getElementById('employeeModal');
+            modal.classList.remove('hidden');
+
+            // Enable Enter key to submit punch
+            document.addEventListener('keydown', handleEnterKey);
           } else {
             alert("Employee not found.");
           }
@@ -110,28 +120,38 @@
 
     function closeModal() {
       document.getElementById('employeeModal').classList.add('hidden');
+      document.removeEventListener('keydown', handleEnterKey); // Clean up
     }
 
     function changePage() {
       const empId = document.getElementById('emp_id').value.trim();
       window.location.href = "login.php?emp_id=" + empId;
     }
+
+    function handleEnterKey(event) {
+      // Only trigger changePage on Enter key
+      if (event.key === 'Enter') {
+        event.preventDefault(); // Prevent default form submission
+        changePage();
+      }
+    }
+
   </script>
   <script>
-  function toggleTheme() {
-    const isDark = document.documentElement.classList.toggle('dark');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-  }
-</script>
-<script>
-  // On page load, set dark mode based on saved preference
-  if (localStorage.getItem('theme') === 'dark' ||
-     (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-    document.documentElement.classList.add('dark');
-  } else {
-    document.documentElement.classList.remove('dark');
-  }
-</script>
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+  </script>
+  <script>
+    // On page load, set dark mode based on saved preference
+    if (localStorage.getItem('theme') === 'dark' ||
+      (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  </script>
 
 </body>
 

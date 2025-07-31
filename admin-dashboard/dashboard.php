@@ -9,8 +9,39 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
+function getRoleColorClass($roleName)
+{
+  // Create a hash from the role name
+  $hash = crc32($roleName);
+  $hue = $hash % 360; // Restrict hue to 0-359
+
+  // Generate a Tailwind-compatible HSL class (e.g., text-[hsl(var(--hue))]
+  return "bg-[hsl({$hue},70%,90%)] text-[hsl({$hue},40%,30%)] dark:bg-[hsl({$hue},60%,30%)] dark:text-white";
+}
+
+
 $rolesResult = $conn->query("SELECT id, name FROM roles");
 $departmentsResult = $conn->query("SELECT department_id, dept_name FROM departments");
+
+$salaryRangeQuery = "SELECT MIN(salary) as min_salary, MAX(salary) as max_salary FROM employees";
+$rangeResult = $conn->query($salaryRangeQuery);
+$rangeData = $rangeResult->fetch_assoc();
+$minSalary = $rangeData['min_salary'];
+$maxSalary = $rangeData['max_salary'];
+
+function getSalaryColor($salary, $min, $max) {
+  if ($max == $min) {
+    $percent = 0.5; // Prevent divide-by-zero
+  } else {
+    $percent = ($salary - $min) / ($max - $min);
+  }
+
+  // Interpolate hue from red (0) to green (120)
+  $hue = intval(120 * $percent); // 0 = red, 60 = yellow, 120 = green
+
+  return "bg-[hsl({$hue},90%,90%)] text-[hsl({$hue},60%,25%)] dark:bg-[hsl({$hue},40%,20%)] dark:text-white";
+}
+
 
 $filters = [];
 $params = [];
@@ -207,8 +238,10 @@ $result = $stmt->get_result();
               echo "<td class='px-4 py-3'>{$i}</td>";
               echo "<td class='px-4 py-3'>{$empId}</td>";
               echo "<td class='px-4 py-3'>{$name}</td>";
-              echo "<td class='px-4 py-3'><span class='px-2 py-1 text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded'>{$role}</span></td>";
-              echo "<td class='px-4 py-3'><span class='px-2 py-1 text-sm font-medium rounded {$salaryClass}'>₹{$salary}</span></td>";
+              $roleClass = getRoleColorClass($role);
+              echo "<td class='px-4 py-3'><span class='px-2 py-1 text-sm font-medium rounded {$roleClass}'>{$role}</span></td>";
+              $salaryColor = getSalaryColor($row["salary"], $minSalary, $maxSalary);
+              echo "<td><span class='px-2 py-1 rounded font-medium {$salaryColor}'>{$salary}</span></td>";
               echo "</tr>";
               $i++;
             }
