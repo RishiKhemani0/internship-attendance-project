@@ -235,5 +235,15 @@ $stmt->bind_param("sssssssiiissi",
       password.type = checkShowBox.checked ? "text" : "password";
     });
   </script>
+  <script>
+  // On page load, set dark mode based on saved preference
+  if (localStorage.getItem('theme') === 'dark' ||
+     (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+</script>
+
 </body>
 </html>

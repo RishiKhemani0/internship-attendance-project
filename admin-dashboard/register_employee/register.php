@@ -66,41 +66,42 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   <title>Register Employee</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    
+
   </style>
 </head>
 
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
   <!-- Navbar -->
-<nav class="bg-white dark:bg-gray-800 shadow-md border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-  <div class="max-w-full flex justify-between items-center">
-    
-    <!-- Left: Logo + Title -->
-    <div class="flex items-center space-x-3">
-      <img src="../../images/transparent-logo.png" alt="Logo" class="w-8 h-8" />
-      <span class="text-xl font-semibold text-gray-800 dark:text-white">Attentify Dashboard</span>
-    </div>
+  <nav class="bg-white dark:bg-gray-800 shadow-md border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+    <div class="max-w-full flex justify-between items-center">
 
-    <!-- Right: Controls -->
-    <div class="flex items-center gap-4">
-      <!-- Dark Mode Toggle -->
-      <button onclick="document.documentElement.classList.toggle('dark')" title="Toggle Dark Mode"
-        class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white transition">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-          viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M12 3v1m0 16v1m8.66-8.66h1M3.34 12H2.34m15.36 4.24l.71.71M6.34 6.34l-.71-.71m12.02-.02l-.71.71M6.34 17.66l.71-.71M21 12a9 9 0 11-9-9c.34 0 .68.02 1.01.06a7 7 0 008.93 8.94c.04.33.06.67.06 1z" />
-        </svg>
-      </button>
-
-      <!-- Profile Icon (placeholder) -->
-      <div class="w-9 h-9 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-700 dark:text-white">
-        <i class="fa-solid fa-user text-sm"></i>
+      <!-- Left: Logo + Title -->
+      <div class="flex items-center space-x-3">
+        <img src="../../images/transparent-logo.png" alt="Logo" class="w-8 h-8" />
+        <span class="text-xl font-semibold text-gray-800 dark:text-white">Attentify Dashboard</span>
       </div>
-    </div>
 
-  </div>
-</nav>
+      <!-- Right: Controls -->
+      <div class="flex items-center gap-4">
+        <!-- Dark Mode Toggle -->
+        <button onclick="document.documentElement.classList.toggle('dark')" title="Toggle Dark Mode"
+          class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 3v1m0 16v1m8.66-8.66h1M3.34 12H2.34m15.36 4.24l.71.71M6.34 6.34l-.71-.71m12.02-.02l-.71.71M6.34 17.66l.71-.71M21 12a9 9 0 11-9-9c.34 0 .68.02 1.01.06a7 7 0 008.93 8.94c.04.33.06.67.06 1z" />
+          </svg>
+        </button>
+
+        <!-- Profile Icon (placeholder) -->
+        <div
+          class="w-9 h-9 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-700 dark:text-white">
+          <i class="fa-solid fa-user text-sm"></i>
+        </div>
+      </div>
+
+    </div>
+  </nav>
   <!-- Registration Form -->
   <div class="container mx-auto my-8 px-4">
     <div class="max-w-5xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow p-6">
@@ -109,43 +110,60 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       <form action="register.php" method="post" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
           <label class="block mb-1">First Name</label>
-          <input type="text" name="first_name" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900" required>
+          <input type="text" name="first_name"
+            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+            required>
         </div>
         <div>
           <label class="block mb-1">Middle Name</label>
-          <input type="text" name="middle_name" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900">
+          <input type="text" name="middle_name"
+            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900">
         </div>
         <div>
           <label class="block mb-1">Last Name</label>
-          <input type="text" name="last_name" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900" required>
+          <input type="text" name="last_name"
+            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+            required>
         </div>
 
         <div>
           <label class="block mb-1">Email</label>
-          <input type="email" name="email" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900" required>
+          <input type="email" name="email"
+            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+            required>
         </div>
         <div>
           <label class="block mb-1">Phone Number</label>
-          <input type="tel" name="phone_num" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900" required>
+          <input type="tel" name="phone_num"
+            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+            required>
         </div>
 
         <div>
           <label class="block mb-1">Birth Date</label>
-          <input type="date" name="birth_date" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900" required>
+          <input type="date" name="birth_date"
+            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+            required>
         </div>
         <div>
           <label class="block mb-1">Hire Date</label>
-          <input type="date" name="hire_date" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900" required>
+          <input type="date" name="hire_date"
+            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+            required>
         </div>
 
         <div>
           <label class="block mb-1">Salary</label>
-          <input type="number" name="salary" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900" required>
+          <input type="number" name="salary"
+            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+            required>
         </div>
 
         <div>
           <label class="block mb-1">Role</label>
-          <select name="role" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900" required>
+          <select name="role"
+            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+            required>
             <option value="">Select Role</option>
             <?php foreach ($roles as $role): ?>
               <option value="<?= $role['id'] ?>"><?= htmlspecialchars($role['name']) ?></option>
@@ -155,7 +173,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         <div>
           <label class="block mb-1">Department</label>
-          <select name="department" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900" required>
+          <select name="department"
+            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+            required>
             <option value="">Select Department</option>
             <?php foreach ($departments as $dept): ?>
               <option value="<?= $dept['department_id'] ?>"><?= htmlspecialchars($dept['dept_name']) ?></option>
@@ -165,7 +185,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         <div>
           <label class="block mb-1">Gender</label>
-          <select name="gender" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900" required>
+          <select name="gender"
+            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+            required>
             <option value="">Select Gender</option>
             <option>Male</option>
             <option>Female</option>
@@ -175,7 +197,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         <div>
           <label class="block mb-1">Password</label>
-          <input type="password" name="password" id="password" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900" required>
+          <input type="password" name="password" id="password"
+            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+            required>
         </div>
 
         <div class="col-span-full">
@@ -186,7 +210,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </div>
 
         <div class="col-span-full text-center">
-          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded">Register</button>
+          <button type="submit"
+            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded">Register</button>
         </div>
       </form>
     </div>
@@ -200,6 +225,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       password.type = checkShowBox.checked ? "text" : "password";
     });
   </script>
+  <script>
+    // On page load, set dark mode based on saved preference
+    if (localStorage.getItem('theme') === 'dark' ||
+      (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  </script>
+
 </body>
 
 </html>

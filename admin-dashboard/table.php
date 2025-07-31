@@ -96,7 +96,8 @@ $result = $conn->query($sql);
       <img src="../images/transparent-logo.png" alt="Logo" class="h-8">
       <span class="text-xl font-semibold">Attentify</span>
     </div>
-    <button onclick="toggleTheme()" class="bg-blue-800 px-3 py-1 rounded hover:bg-blue-700 dark:bg-gray-700 dark:hover:bg-gray-600">
+    <button onclick="toggleTheme()"
+      class="bg-blue-800 px-3 py-1 rounded hover:bg-blue-700 dark:bg-gray-700 dark:hover:bg-gray-600">
       Toggle Dark Mode
     </button>
   </nav>
@@ -127,8 +128,10 @@ $result = $conn->query($sql);
     </div>
 
     <div class="flex justify-center gap-4 mt-6">
-      <a href="edit.php?id=<?= $employee_id ?>" class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Edit</a>
-      <a href="table.php?delete_id=<?= $employee_id ?>" onclick="return confirm('Are you sure?');" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Delete</a>
+      <a href="edit.php?id=<?= $employee_id ?>"
+        class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Edit</a>
+      <a href="table.php?delete_id=<?= $employee_id ?>" onclick="return confirm('Are you sure?');"
+        class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Delete</a>
     </div>
   </div>
 
@@ -139,9 +142,11 @@ $result = $conn->query($sql);
     <form method="GET" class="flex flex-wrap items-center gap-4 mb-6">
       <div class="flex items-center gap-2">
         <label>From:</label>
-        <input type="date" name="from" value="<?= htmlspecialchars($from) ?>" class="border rounded px-2 py-1 dark:bg-gray-800 dark:border-gray-600">
+        <input type="date" name="from" value="<?= htmlspecialchars($from) ?>"
+          class="border rounded px-2 py-1 dark:bg-gray-800 dark:border-gray-600">
         <label>To:</label>
-        <input type="date" name="to" value="<?= htmlspecialchars($to) ?>" class="border rounded px-2 py-1 dark:bg-gray-800 dark:border-gray-600">
+        <input type="date" name="to" value="<?= htmlspecialchars($to) ?>"
+          class="border rounded px-2 py-1 dark:bg-gray-800 dark:border-gray-600">
       </div>
       <select name="status" class="border rounded px-2 py-1 dark:bg-gray-800 dark:border-gray-600">
         <option value="">All</option>
@@ -192,5 +197,17 @@ $result = $conn->query($sql);
       <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-orange-500"></span> Late</span>
     </div>
   </main>
+
+  <script>
+    // On page load, set dark mode based on saved preference
+    if (localStorage.getItem('theme') === 'dark' ||
+      (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  </script>
+
 </body>
+
 </html>
