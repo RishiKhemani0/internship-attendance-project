@@ -1,29 +1,19 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Punch In</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Company Login / Register</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            inter: ['Inter', 'sans-serif'],
-            manrope: ['Manrope', 'sans-serif'],
-          },
-        },
-      },
+      darkMode: 'class'
     }
   </script>
 </head>
+<body class="bg-gray-100 dark:bg-gray-900 font-sans transition-colors duration-300">
 
-<body class="font-inter bg-gray-100 dark:bg-gray-900">
-  <!-- Navbar -->
-  <nav class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-md px-6 py-4 w-full fixed">
+    <nav class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-md px-6 py-4 w-full fixed">
     <div class="max-w-full flex justify-between items-center">
       <div class="flex items-center space-x-3">
         <img src="images/transparent-logo.png" alt="Logo" class="w-8 h-8" />
@@ -41,105 +31,73 @@
       </div>
     </div>
   </nav>
-  <div class="flex items-center justify-center min-h-screen">
-    <div class="w-full max-w-md bg-white dark:bg-gray-800 shadow-2xl rounded-2xl p-8 transition">
-      <div class="flex items-center justify-center mb-8">
-        <img src="./images/transparent-logo.png" alt="logo" class="h-12 me-3 object-cover">
-        <p class="text-3xl font-bold text-gray-800 dark:text-white">Attendify</p>
-      </div>
-      <form id="loginForm" onsubmit="return handleLogin(event)">
-        <h1 class="text-center text-2xl font-bold text-gray-900 dark:text-white mb-6">Punch In</h1>
-        <input type="text" id="emp_id"
-          class="w-full h-12 px-4 mb-6 rounded-full text-gray-900 placeholder-gray-400 border border-gray-300 focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-300"
-          placeholder="Employee ID" required autofocus>
-        <button type="submit"
-          class="w-full h-12 rounded-full bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition">
-          Check
-        </button>
-      </form>
-    </div>
-  </div>
 
-  <!-- Modal -->
-  <div id="employeeModal"
-    class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex justify-center items-center transition duration-300">
-    <div
-      class="bg-white dark:bg-gray-800 rounded-2xl p-8 w-full max-w-md shadow-2xl border border-gray-200 dark:border-gray-700">
-      <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white text-center">Employee Details</h2>
-      <div id="employeeDetails" class="text-gray-700 dark:text-gray-200 space-y-2 text-sm sm:text-base"></div>
-      <div class="mt-6 space-y-3">
-        <button onclick="changePage()"
-          class="bg-[hsl(0,90%,90%)] text-[hsl(0,60%,25%)] dark:bg-[hsl(0,40%,20%)] dark:text-white px-4 py-3 px-2 py-1 text-sm font-medium rounded-full w-full">Punch <span
-            id="status"></span></button>
-        <button onclick="closeModal()"
-          class="bg-[hsl(120,90%,90%)] text-[hsl(120,60%,25%)] dark:bg-[hsl(120,40%,20%)] dark:text-white px-4 py-3 px-2 py-1 text-sm font-medium rounded-full w-full">Close</button>
-      </div>
+<div class="flex items-center justify-center min-h-screen">
+  <div class="bg-white dark:bg-gray-800 shadow-2xl rounded-2xl p-8 max-w-md w-full border border-gray-200 dark:border-gray-700">
+    <div class="flex justify-center mb-6 space-x-4">
+      <button onclick="showTab('login')" id="loginTab" class="text-sm font-medium px-4 py-2 rounded-full bg-sky-600 text-white">Login</button>
+      <button onclick="showTab('register')" id="registerTab" class="text-sm font-medium px-4 py-2 rounded-full bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200">Register</button>
     </div>
+
+    <!-- Login Form -->
+    <form id="loginForm" onsubmit="return false" class="space-y-4">
+      <h2 class="text-2xl font-bold text-center text-gray-800 dark:text-white">Company Login</h2>
+      <input type="text" id="loginUsername" placeholder="Username"
+        class="w-full px-4 py-2 border rounded-full dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500" autofocus>
+      <input type="password" placeholder="Password"
+        class="w-full px-4 py-2 border rounded-full dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+      <button
+        class="w-full bg-sky-600 text-white py-2 rounded-full hover:bg-sky-700 transition">Login</button>
+    </form>
+
+    <!-- Register Form -->
+    <form id="registerForm" onsubmit="return false" class="space-y-4 hidden">
+      <h2 class="text-2xl font-bold text-center text-gray-800 dark:text-white">Company Register</h2>
+      <input type="text" placeholder="Company Name"
+        class="w-full px-4 py-2 border rounded-full dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+      <input type="text" placeholder="Username"
+        class="w-full px-4 py-2 border rounded-full dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+      <input type="email" placeholder="Email"
+        class="w-full px-4 py-2 border rounded-full dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+      <input type="password" placeholder="Password"
+        class="w-full px-4 py-2 border rounded-full dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+      <button
+        class="w-full bg-sky-600 text-white py-2 rounded-full hover:bg-sky-700 transition">Register</button>
+    </form>
+  </div>
   </div>
 
   <script>
-    function handleLogin(event) {
-      event.preventDefault();
-      const empId = document.getElementById('emp_id').value.trim();
+    function showTab(tab) {
+      const loginForm = document.getElementById('loginForm');
+      const registerForm = document.getElementById('registerForm');
+      const loginTab = document.getElementById('loginTab');
+      const registerTab = document.getElementById('registerTab');
 
-      if (empId === "admin") {
-        window.location.href = "admin-dashboard/dashboard.php";
-        return;
-      }
-      if (!empId) return;
-
-      fetch(`get_employee.php?employee_id=${encodeURIComponent(empId)}`)
-        .then(response => response.json())
-        .then(data => {
-          if (data && data.employee_id) {
-            document.getElementById('employeeDetails').innerHTML = `
-          <p><strong>ID:</strong> ${data.employee_id}</p>
-          <p><strong>Name:</strong> ${data.first_name} ${data.middle_name || ''} ${data.last_name}</p>
-          <p><strong>Role:</strong> ${data.role}</p>
-          <p><strong>Email:</strong> ${data.email}</p>
-          <p><strong>Phone:</strong> ${data.phone_num}</p>
-          <p><strong>Today's In Time:</strong> ${data.in_time ? data.in_time : 'Not yet punched in'}</p>
-        `;
-            document.getElementById('status').textContent = data.in_time ? 'Out' : 'In';
-
-            // Show modal
-            const modal = document.getElementById('employeeModal');
-            modal.classList.remove('hidden');
-
-            // Enable Enter and Escape key handlers
-            document.addEventListener('keydown', handleKeyEvents);
-          } else {
-            alert("Employee not found.");
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          alert("Error fetching employee data.");
-        });
-    }
-
-    function closeModal() {
-      document.getElementById('employeeModal').classList.add('hidden');
-      document.removeEventListener('keydown', handleKeyEvents); // Clean up key events
-    }
-
-    function changePage() {
-      const empId = document.getElementById('emp_id').value.trim();
-      window.location.href = "login.php?emp_id=" + empId;
-    }
-
-    // Handles both Enter and Escape
-    function handleKeyEvents(event) {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        changePage();
-      } else if (event.key === 'Escape') {
-        event.preventDefault();
-        closeModal();
+      if (tab === 'login') {
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+        loginTab.classList.add('bg-sky-600', 'text-white');
+        loginTab.classList.remove('bg-gray-300', 'dark:bg-gray-700', 'text-gray-800', 'dark:text-gray-200');
+        registerTab.classList.remove('bg-sky-600', 'text-white');
+        registerTab.classList.add('bg-gray-300', 'dark:bg-gray-700', 'text-gray-800', 'dark:text-gray-200');
+        setTimeout(() => document.getElementById('loginUsername').focus(), 100);
+      } else {
+        loginForm.classList.add('hidden');
+        registerForm.classList.remove('hidden');
+        registerTab.classList.add('bg-sky-600', 'text-white');
+        registerTab.classList.remove('bg-gray-300', 'dark:bg-gray-700', 'text-gray-800', 'dark:text-gray-200');
+        loginTab.classList.remove('bg-sky-600', 'text-white');
+        loginTab.classList.add('bg-gray-300', 'dark:bg-gray-700', 'text-gray-800', 'dark:text-gray-200');
       }
     }
 
+    // Set focus on page load
+    window.onload = () => {
+      document.getElementById('loginUsername').focus();
+    };
   </script>
+
   <script>
     function toggleTheme() {
       const isDark = document.documentElement.classList.toggle('dark');
@@ -157,5 +115,4 @@
   </script>
 
 </body>
-
 </html>
