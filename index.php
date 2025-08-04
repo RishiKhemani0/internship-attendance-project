@@ -50,7 +50,7 @@
       <form id="loginForm" onsubmit="return handleLogin(event)">
         <h1 class="text-center text-2xl font-bold text-gray-900 dark:text-white mb-6">Punch In</h1>
         <input type="text" id="emp_id"
-          class="w-full h-12 px-4 mb-6 rounded-full text-gray-900 placeholder-gray-400 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-300"
+          class="w-full h-12 px-4 mb-6 rounded-full text-gray-900 placeholder-gray-400 border border-gray-300 focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-300"
           placeholder="Employee ID" required autofocus>
         <button type="submit"
           class="w-full h-12 rounded-full bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition">
@@ -69,10 +69,10 @@
       <div id="employeeDetails" class="text-gray-700 dark:text-gray-200 space-y-2 text-sm sm:text-base"></div>
       <div class="mt-6 space-y-3">
         <button onclick="changePage()"
-          class="w-full bg-sky-600 text-white py-2 rounded-full hover:bg-sky-700 transition">Punch <span
+          class="bg-[hsl(0,90%,90%)] text-[hsl(0,60%,25%)] dark:bg-[hsl(0,40%,20%)] dark:text-white px-4 py-3 px-2 py-1 text-sm font-medium rounded-full w-full">Punch <span
             id="status"></span></button>
         <button onclick="closeModal()"
-          class="w-full bg-gray-400 text-white py-2 rounded-full hover:bg-gray-500 transition">Close</button>
+          class="bg-[hsl(120,90%,90%)] text-[hsl(120,60%,25%)] dark:bg-[hsl(120,40%,20%)] dark:text-white px-4 py-3 px-2 py-1 text-sm font-medium rounded-full w-full">Close</button>
       </div>
     </div>
   </div>
@@ -106,8 +106,8 @@
             const modal = document.getElementById('employeeModal');
             modal.classList.remove('hidden');
 
-            // Enable Enter key to submit punch
-            document.addEventListener('keydown', handleEnterKey);
+            // Enable Enter and Escape key handlers
+            document.addEventListener('keydown', handleKeyEvents);
           } else {
             alert("Employee not found.");
           }
@@ -120,7 +120,7 @@
 
     function closeModal() {
       document.getElementById('employeeModal').classList.add('hidden');
-      document.removeEventListener('keydown', handleEnterKey); // Clean up
+      document.removeEventListener('keydown', handleKeyEvents); // Clean up key events
     }
 
     function changePage() {
@@ -128,11 +128,14 @@
       window.location.href = "login.php?emp_id=" + empId;
     }
 
-    function handleEnterKey(event) {
-      // Only trigger changePage on Enter key
+    // Handles both Enter and Escape
+    function handleKeyEvents(event) {
       if (event.key === 'Enter') {
-        event.preventDefault(); // Prevent default form submission
+        event.preventDefault();
         changePage();
+      } else if (event.key === 'Escape') {
+        event.preventDefault();
+        closeModal();
       }
     }
 

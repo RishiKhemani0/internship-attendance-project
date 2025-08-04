@@ -129,13 +129,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <div>
           <label class="block mb-1">Email</label>
           <input type="email" name="email"
-            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 invalid:border-pink-500 invalid:text-pink-600 focus:border-sky-500 focus:outline focus:outline-sky-500 focus:invalid:border-pink-500 focus:invalid:outline-pink-500"
             required>
         </div>
         <div>
           <label class="block mb-1">Phone Number</label>
           <input type="tel" name="phone_num"
-            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 invalid:border-pink-500 invalid:text-pink-600 focus:border-sky-500 focus:outline focus:outline-sky-500 focus:invalid:border-pink-500 focus:invalid:outline-pink-500"
             required>
         </div>
 
@@ -153,9 +153,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </div>
 
         <div>
-          <label class="block mb-1">Salary</label>
+          <label
+            class="block mb-1">Salary</label>
           <input type="number" name="salary"
-            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 invalid:border-pink-500 invalid:text-pink-600 focus:border-sky-500 focus:outline focus:outline-sky-500 focus:invalid:border-pink-500 focus:invalid:outline-pink-500"
             required>
         </div>
 
