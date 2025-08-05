@@ -95,19 +95,15 @@ $stmt->bind_param("sssssssiiissi",
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
-  <!-- Navbar -->
-<nav class="bg-white dark:bg-gray-800 shadow-md border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+  <nav class="bg-white dark:bg-gray-800 shadow-md border-b border-gray-200 dark:border-gray-700 px-6 py-4">
   <div class="max-w-full flex justify-between items-center">
     
-    <!-- Left: Logo + Title -->
     <div class="flex items-center space-x-3">
       <img src="../../images/transparent-logo.png" alt="Logo" class="w-8 h-8" />
       <span class="text-xl font-semibold text-gray-800 dark:text-white">Attentify Dashboard</span>
     </div>
 
-    <!-- Right: Controls -->
     <div class="flex items-center gap-4">
-      <!-- Dark Mode Toggle -->
       <button onclick="document.documentElement.classList.toggle('dark')" title="Toggle Dark Mode"
         class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white transition">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
@@ -117,7 +113,6 @@ $stmt->bind_param("sssssssiiissi",
         </svg>
       </button>
 
-      <!-- Profile Icon (placeholder) -->
       <div class="w-9 h-9 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-700 dark:text-white">
         <i class="fa-solid fa-user text-sm"></i>
       </div>
@@ -126,9 +121,7 @@ $stmt->bind_param("sssssssiiissi",
   </div>
 </nav>
 
-  <!-- Edit Form -->
-  <!-- Edit Form -->
-<div class="max-w-5xl mx-auto p-6 mt-10 bg-white dark:bg-gray-800 shadow-md rounded-lg">
+  <div class="max-w-5xl mx-auto p-6 mt-10 bg-white dark:bg-gray-800 shadow-md rounded-lg">
   <h2 class="text-2xl font-bold mb-6 text-center">Edit Employee</h2>
   <form action="" method="post" class="space-y-6">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">

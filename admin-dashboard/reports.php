@@ -9,28 +9,54 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
+// Get the number of working days in the current month
+$currentMonth = date('Y-m');
+$daysInMonth = cal_days_in_month(CAL_GREGORIAN, date('m'), date('Y'));
+$workingDays = 0;
+for ($i = 1; $i <= $daysInMonth; $i++) {
+    $date = new DateTime("$currentMonth-$i");
+    $dayOfWeek = $date->format('N');
+    if ($dayOfWeek < 6) { // 1 to 5 are Monday to Friday
+        $workingDays++;
+    }
+}
+
+$dateFilter = "";
+if (!empty($_GET['from']) && !empty($_GET['to'])) {
+    $from = $conn->real_escape_string($_GET['from']);
+    $to = $conn->real_escape_string($_GET['to']);
+    $dateFilter = " WHERE DATE(in_time) BETWEEN '$from' AND '$to'";
+}
+
 $statsQuery = "
   SELECT 
-    attendance_date, 
+    DATE(in_time) as attendance_date,
     SUM(CASE WHEN status = 'on-time' THEN 1 ELSE 0 END) AS on_time,
     SUM(CASE WHEN status = 'late' THEN 1 ELSE 0 END) AS late
   FROM attendance
+  $dateFilter
   GROUP BY attendance_date
   ORDER BY attendance_date ASC
 ";
 
-$monthlyPercentageQuery = "
+$monthlyStatsQuery = "
   SELECT 
-    DATE_FORMAT(attendance_date, '%Y-%m') AS month,
-    COUNT(DISTINCT employee_id) AS total_employees,
-    SUM(CASE WHEN status IS NOT NULL THEN 1 ELSE 0 END) / COUNT(DISTINCT employee_id) AS days_present_total
+    DATE_FORMAT(in_time, '%Y-%m') AS month,
+    COUNT(DISTINCT employee_id) AS present_employees
   FROM attendance
   GROUP BY month
   ORDER BY month ASC
 ";
 
 $statsResult = $conn->query($statsQuery);
-$monthlyResult = $conn->query($monthlyPercentageQuery);
+if ($statsResult === false) {
+    die("Error fetching daily stats: " . $conn->error);
+}
+
+$monthlyResult = $conn->query($monthlyStatsQuery);
+if ($monthlyResult === false) {
+    die("Error fetching monthly stats: " . $conn->error);
+}
 
 $dates = [];
 $onTimeData = [];
@@ -44,10 +70,15 @@ while ($row = $statsResult->fetch_assoc()) {
 
 $months = [];
 $monthlyPercentages = [];
+$totalEmployees = $conn->query("SELECT COUNT(*) FROM employees")->fetch_row()[0];
 
 while ($row = $monthlyResult->fetch_assoc()) {
   $months[] = $row['month'];
-  $monthlyPercentages[] = round(($row['days_present_total'] / 22) * 100, 2);
+  if ($totalEmployees > 0) {
+      $monthlyPercentages[] = round(($row['present_employees'] / $totalEmployees) * 100, 2);
+  } else {
+      $monthlyPercentages[] = 0;
+  }
 }
 ?>
 
@@ -68,7 +99,6 @@ while ($row = $monthlyResult->fetch_assoc()) {
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans transition-all duration-300">
 
-  <!-- Navbar -->
   <nav class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-md px-6 py-4">
     <div class="max-w-full flex justify-between items-center">
       <div class="flex items-center space-x-3">
@@ -92,7 +122,6 @@ while ($row = $monthlyResult->fetch_assoc()) {
   </nav>
 
   <div class="flex">
-    <!-- Sidebar -->
     <aside class="w-64 bg-white dark:bg-gray-800 p-6 border-r border-gray-200 dark:border-gray-700 hidden md:block">
       <ul class="space-y-4">
         <li><a href="./reports.php" class="block px-4 py-2 rounded bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-white font-medium"><i class="fa-solid nav-icon fa-chart-simple"></i> Attendance Report</a></li>
@@ -101,17 +130,26 @@ while ($row = $monthlyResult->fetch_assoc()) {
       </ul>
     </aside>
 
-    <!-- Main Content -->
     <main class="flex-1 p-6 overflow-auto">
       <h2 class="text-2xl font-semibold mb-6"><i class="fa-solid nav-icon fa-chart-simple"></i> Attendance Reports</h2>
 
-      <!-- Date Filter -->
-      <div class="mb-6">
-        <label for="filterDate" class="block mb-2 font-medium">Filter by Date:</label>
-        <input type="date" id="filterDate" class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded px-4 py-2" />
-      </div>
+      <form method="GET" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+          <div>
+            <label for="from" class="block mb-2 font-medium">From:</label>
+            <input type="date" id="from" name="from" value="<?= htmlspecialchars($_GET['from'] ?? '') ?>" class="w-full bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-4 py-2 focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <div>
+            <label for="to" class="block mb-2 font-medium">To:</label>
+            <input type="date" id="to" name="to" value="<?= htmlspecialchars($_GET['to'] ?? '') ?>" class="w-full bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-4 py-2 focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <div class="flex gap-2">
+            <button type="submit" class="w-full bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">Apply</button>
+            <a href="reports.php" class="w-full bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white px-4 py-2 rounded text-center hover:bg-gray-300 dark:hover:bg-gray-600 transition">Reset</a>
+          </div>
+        </div>
+      </form>
 
-      <!-- Summary Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div class="bg-white dark:bg-gray-800 shadow rounded p-4">
           <div class="text-gray-500 dark:text-gray-400 text-sm">Total Days</div>
@@ -131,13 +169,11 @@ while ($row = $monthlyResult->fetch_assoc()) {
         </div>
       </div>
 
-      <!-- Line Chart -->
       <div class="bg-white dark:bg-gray-800 rounded shadow p-6 mb-8">
         <h3 class="text-lg font-semibold mb-4">Daily On-Time vs Late Attendance</h3>
         <canvas id="lineChart" height="100"></canvas>
       </div>
 
-      <!-- Bar Chart -->
       <div class="bg-white dark:bg-gray-800 rounded shadow p-6">
         <h3 class="text-lg font-semibold mb-4">Monthly Presence Percentage</h3>
         <canvas id="monthlyChart" height="100"></canvas>
@@ -213,6 +249,11 @@ while ($row = $monthlyResult->fetch_assoc()) {
 
   <script>
   // On page load, set dark mode based on saved preference
+  function toggleTheme() {
+    const isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  }
+
   if (localStorage.getItem('theme') === 'dark' ||
      (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
     document.documentElement.classList.add('dark');

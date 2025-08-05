@@ -13,31 +13,45 @@ $from = $_GET['from'] ?? '';
 $to = $_GET['to'] ?? '';
 $status = $_GET['status'] ?? '';
 $search = $_GET['search'] ?? '';
-$sort = $_GET['sort'] ?? 'attendance_date';
+$sort = $_GET['sort'] ?? 'in_time';
 $order = $_GET['order'] ?? 'asc';
-$expected_time = "13:00:00";
 
 $where = [];
+$paramTypes = '';
+$params = [];
+
 if (!empty($from) && !empty($to)) {
-  $where[] = "attendance_date BETWEEN '$from' AND '$to'";
+  $where[] = "DATE(in_time) BETWEEN ? AND ?";
+  $params[] = $from;
+  $params[] = $to;
+  $paramTypes .= 'ss';
 }
 if (!empty($status)) {
-  if ($status == "On-Time") {
-    $where[] = "TIME(in_time) <= '" .$expected_time ."'";
-  } elseif ($status == "Late") {
-    $where[] = "TIME(in_time) > '" .$expected_time ."'";
-  }
+  $where[] = "status = ?";
+  $params[] = $status;
+  $paramTypes .= 's';
 }
 
 if (!empty($search)) {
-  $search = $conn->real_escape_string($search);
-  $where[] = "employee_id LIKE '%$search%'";
+  $where[] = "employee_id = ?";
+  $params[] = $search;
+  $paramTypes .= 's';
 }
 
 $whereClause = count($where) ? 'WHERE ' . implode(' AND ', $where) : '';
 
-$sql = "SELECT * FROM attendance $whereClause ORDER BY $sort $order";
-$result = $conn->query($sql);
+$sql = "SELECT employee_id, in_time, out_time FROM attendance $whereClause ORDER BY $sort $order";
+$stmt = $conn->prepare($sql);
+
+if (!empty($params)) {
+    $stmt->bind_param($paramTypes, ...$params);
+}
+
+if (!$stmt->execute()) {
+    die("Error executing statement: " . $stmt->error);
+}
+
+$result = $stmt->get_result();
 
 header("Content-Type: application/vnd.ms-excel");
 header("Content-Disposition: attachment; filename=attendance_report.xls");
@@ -50,16 +64,20 @@ echo "<tr><th>Employee ID</th><th>Date</th><th>Time In</th><th>Time Out</th><th>
 
 while ($row = $result->fetch_assoc()) {
   $in = new DateTime($row['in_time']);
-  $out = new DateTime($row['out_time']);
+  $out = $row['out_time'] ? new DateTime($row['out_time']) : new DateTime();
   $interval = $in->diff($out);
+  $out_time_display = $row['out_time'] ? $out->format('Y-m-d H:i:s') : "Not punched out";
+  $working_hours = $row['out_time'] ? $interval->format('%h hr %i min') : 'Ongoing';
+
   echo "<tr>";
   echo "<td>" . htmlspecialchars($row['employee_id']) . "</td>";
-  echo "<td>" . $row['attendance_date'] . "</td>";
-  echo "<td>" . htmlspecialchars($row['in_time']) . "</td>";
-  echo "<td>" . htmlspecialchars($row['out_time']) . "</td>";
-  echo "<td>" . $interval->format('%h hr %i min') . "</td>";
+  echo "<td>" . $in->format('Y-m-d') . "</td>";
+  echo "<td>" . htmlspecialchars($in->format('H:i:s')) . "</td>";
+  echo "<td>" . $out_time_display . "</td>";
+  echo "<td>" . $working_hours . "</td>";
   echo "</tr>";
 }
 
 echo "</table>";
 $conn->close();
+?>

@@ -19,7 +19,7 @@ if (!$employee_id) {
   exit();
 }
 
-// SQL to fetch employee details + today's in_time from attendance
+// SQL to fetch employee details and the in_time of the most recent open shift
 $sql = "SELECT 
           e.employee_id, 
           e.first_name, 
@@ -31,8 +31,10 @@ $sql = "SELECT
           a.in_time
         FROM employees e
         JOIN roles r ON e.role = r.id
-        LEFT JOIN attendance a ON e.employee_id = a.employee_id AND DATE(a.attendance_date) = CURDATE()
-        WHERE e.employee_id = ?";
+        LEFT JOIN attendance a ON e.employee_id = a.employee_id AND a.out_time IS NULL
+        WHERE e.employee_id = ?
+        ORDER BY a.in_time DESC
+        LIMIT 1"; 
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $employee_id);

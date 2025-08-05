@@ -3,7 +3,7 @@ $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "attendance-db";
-$result = $emp_id = $password = $row = $first_name = $date = $time = $status = "";
+$result = $emp_id = $password = $row = $first_name = $date = $time = $status = $company_id = "";
 
 date_default_timezone_set('Asia/Kolkata');
 
@@ -16,7 +16,7 @@ if ($conn->connect_error) {
 
 $emp_id = $_GET['emp_id'] ?? '';
 
-$sql = "SELECT * FROM employees where employee_id=$emp_id";
+$sql = "SELECT first_name, company_id FROM employees where employee_id=$emp_id";
 $result = $conn->query($sql);
 
 $row = $result->fetch_assoc();
@@ -25,25 +25,29 @@ if ($row == null) {
     exit;
 }
 $first_name = $row["first_name"];
+$company_id = $row["company_id"];
 
-$date = date('Y-m-d');
-$time = date("H:i:s");
+$current_datetime = new DateTime();
+$date = $current_datetime->format('Y-m-d');
+$time = $current_datetime->format('H:i:s');
+$datetime_string = $current_datetime->format('Y-m-d H:i:s');
 
-$sql = "SELECT * FROM attendance where employee_id=$emp_id and attendance_date='$date'";
+// Check for an existing attendance record with a NULL out_time
+$sql = "SELECT * FROM attendance where employee_id=$emp_id and out_time IS NULL";
 $result = $conn->query($sql);
 $row = $result->fetch_assoc();
 
 $status = $time > "13:00:00" ? "late" : "on-time";
 
 if ($result->num_rows == 0) {
-    $sql = "INSERT INTO attendance(employee_id, attendance_date, `status`, in_time, out_time) VALUES ('$emp_id','$date','$status','$time', 'NULL')";
+    // No open shift found, so this is a Punch In
+    $sql = "INSERT INTO attendance(company_id, employee_id, shift_start_date, `status`, in_time, out_time) VALUES ('$company_id', '$emp_id', '$date', '$status', '$datetime_string', NULL)";
     $status = "In";
-} else if ($row["out_time"] != "00:00:00") {
-    return;
 } else {
+    // Open shift found, so this is a Punch Out
     $sql = "UPDATE attendance
-    SET out_time = '$time'
-    WHERE employee_id = '$emp_id';";
+    SET out_time = '$datetime_string'
+    WHERE employee_id = '$emp_id' AND out_time IS NULL;";
     $status = "Out";
 }
 

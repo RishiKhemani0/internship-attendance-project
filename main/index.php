@@ -15,14 +15,17 @@
             inter: ['Inter', 'sans-serif'],
             manrope: ['Manrope', 'sans-serif'],
           },
+          colors: {
+            punchIn: '#22C55E',
+            punchOut: '#EF4444',
+          }
         },
       },
     }
   </script>
 </head>
 
-<body class="font-inter bg-gray-100 dark:bg-gray-900">
-  <!-- Navbar -->
+<body class="font-inter bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
   <nav class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-md px-6 py-4 w-full fixed">
     <div class="max-w-full flex justify-between items-center">
       <div class="flex items-center space-x-3">
@@ -41,6 +44,7 @@
       </div>
     </div>
   </nav>
+
   <div class="flex items-center justify-center min-h-screen">
     <div class="w-full max-w-md bg-white dark:bg-gray-800 shadow-2xl rounded-2xl p-8 transition">
       <div class="flex items-center justify-center mb-8">
@@ -53,14 +57,13 @@
           class="w-full h-12 px-4 mb-6 rounded-full text-gray-900 placeholder-gray-400 border border-gray-300 focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-300"
           placeholder="Employee ID" required autofocus>
         <button type="submit"
-          class="w-full h-12 rounded-full bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition">
+          class="w-full h-12 rounded-full bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition duration-200">
           Check
         </button>
       </form>
     </div>
   </div>
 
-  <!-- Modal -->
   <div id="employeeModal"
     class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex justify-center items-center transition duration-300">
     <div
@@ -68,11 +71,12 @@
       <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white text-center">Employee Details</h2>
       <div id="employeeDetails" class="text-gray-700 dark:text-gray-200 space-y-2 text-sm sm:text-base"></div>
       <div class="mt-6 space-y-3">
-        <button onclick="changePage()"
-          class="bg-[hsl(0,90%,90%)] text-[hsl(0,60%,25%)] dark:bg-[hsl(0,40%,20%)] dark:text-white px-4 py-3 px-2 py-1 text-sm font-medium rounded-full w-full">Punch <span
-            id="status"></span></button>
+        <button onclick="changePage()" id="punchButton"
+          class="px-4 py-3 text-sm font-medium rounded-full w-full transition duration-200">
+          Punch <span id="status"></span>
+        </button>
         <button onclick="closeModal()"
-          class="bg-[hsl(120,90%,90%)] text-[hsl(120,60%,25%)] dark:bg-[hsl(120,40%,20%)] dark:text-white px-4 py-3 px-2 py-1 text-sm font-medium rounded-full w-full">Close</button>
+          class="bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white px-4 py-3 text-sm font-medium rounded-full w-full transition duration-200 hover:bg-gray-300 dark:hover:bg-gray-600">Close</button>
       </div>
     </div>
   </div>
@@ -92,15 +96,27 @@
         .then(response => response.json())
         .then(data => {
           if (data && data.employee_id) {
+            const inTime = data.in_time ? new Date(data.in_time).toLocaleString() : 'Not yet punched in';
             document.getElementById('employeeDetails').innerHTML = `
-          <p><strong>ID:</strong> ${data.employee_id}</p>
-          <p><strong>Name:</strong> ${data.first_name} ${data.middle_name || ''} ${data.last_name}</p>
-          <p><strong>Role:</strong> ${data.role}</p>
-          <p><strong>Email:</strong> ${data.email}</p>
-          <p><strong>Phone:</strong> ${data.phone_num}</p>
-          <p><strong>Today's In Time:</strong> ${data.in_time ? data.in_time : 'Not yet punched in'}</p>
-        `;
-            document.getElementById('status').textContent = data.in_time ? 'Out' : 'In';
+            <p><strong>ID:</strong> ${data.employee_id}</p>
+            <p><strong>Name:</strong> ${data.first_name} ${data.middle_name || ''} ${data.last_name}</p>
+            <p><strong>Role:</strong> ${data.role}</p>
+            <p><strong>Email:</strong> ${data.email}</p>
+            <p><strong>Phone:</strong> ${data.phone_num}</p>
+            <p><strong>Last Punch In:</strong> ${inTime}</p>
+          `;
+            const status = data.in_time ? 'Out' : 'In';
+            const punchButton = document.getElementById('punchButton');
+            document.getElementById('status').textContent = status;
+
+            // Set button color based on status
+            if (status === 'In') {
+              punchButton.classList.remove('bg-punchOut', 'hover:bg-red-700');
+              punchButton.classList.add('bg-punchIn', 'text-white', 'hover:bg-green-700');
+            } else {
+              punchButton.classList.remove('bg-punchIn', 'hover:bg-green-700');
+              punchButton.classList.add('bg-punchOut', 'text-white', 'hover:bg-red-700');
+            }
 
             // Show modal
             const modal = document.getElementById('employeeModal');
@@ -138,7 +154,6 @@
         closeModal();
       }
     }
-
   </script>
   <script>
     function toggleTheme() {
