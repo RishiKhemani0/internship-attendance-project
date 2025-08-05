@@ -118,7 +118,7 @@ $result = $stmt->get_result();
         <input type="text" name="search_emp_id"
           value="<?= isset($_GET['search_emp_id']) ? htmlspecialchars($_GET['search_emp_id']) : '' ?>"
           placeholder="Search by Employee ID..."
-          class="w-full px-4 py-2 rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white text-sm border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          class="w-full px-4 py-2 rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white text-sm border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
       </form>
 
 
@@ -126,7 +126,7 @@ $result = $stmt->get_result();
       <div class="flex items-center gap-4">
         <!-- Dark Mode Toggle -->
         <button onclick="document.documentElement.classList.toggle('dark')" title="Toggle Dark Mode"
-          class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white transition">
+          class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-white transition">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
             stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round"
@@ -149,11 +149,11 @@ $result = $stmt->get_result();
     <!-- Sidebar -->
     <aside class="w-64 bg-white dark:bg-gray-800 p-6 shadow-md hidden md:block min-h-screen">
       <ul class="space-y-3">
-        <li><a href="./reports.php" class="block px-4 py-2 rounded hover:bg-blue-100 dark:hover:bg-blue-900"><i
+        <li><a href="./reports.php" class="block px-4 py-2 rounded hover:bg-indigo-100 dark:hover:bg-indigo-900"><i
               class="fa-solid nav-icon fa-chart-simple"></i> Attendance Report</a></li>
-        <li><a href="./dashboard.php" class="block px-4 py-2 rounded bg-blue-100 dark:bg-blue-900 font-semibold"><i
+        <li><a href="./dashboard.php" class="block px-4 py-2 rounded bg-indigo-100 dark:bg-indigo-900 font-semibold"><i
               class="fa-solid nav-icon fa-tablet"></i> Dashboard</a></li>
-        <li><a href="#" class="block px-4 py-2 rounded hover:bg-blue-100 dark:hover:bg-blue-900"><i
+        <li><a href="#" class="block px-4 py-2 rounded hover:bg-indigo-100 dark:hover:bg-indigo-900"><i
               class="fa-solid fa-user"></i> Company Info</a></li>
       </ul>
     </aside>
@@ -205,7 +205,7 @@ $result = $stmt->get_result();
             value="<?= isset($_GET['search_emp_id']) ? htmlspecialchars($_GET['search_emp_id']) : '' ?>">
         </div>
         <div class="md:col-span-4 flex justify-end gap-3 mt-2">
-          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Apply
+          <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">Apply
             Filters</button>
           <a href="dashboard.php"
             class="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-700">Reset</a>
@@ -234,7 +234,7 @@ $result = $stmt->get_result();
               $salary = number_format($row["salary"]);
               $salaryClass = $row["salary"] > 50000 ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
 
-              echo "<tr onclick=\"window.location.href='table.php?employee_id={$empId}'\" class='hover:bg-blue-50 dark:hover:bg-gray-700 cursor-pointer transition'>";
+              echo "<tr onclick=\"window.location.href='table.php?employee_id={$empId}'\" class='hover:bg-indigo-50 dark:hover:bg-gray-700 cursor-pointer transition'>";
               echo "<td class='px-4 py-3'>{$i}</td>";
               echo "<td class='px-4 py-3'>{$empId}</td>";
               echo "<td class='px-4 py-3'>{$name}</td>";

@@ -16,7 +16,7 @@
     <nav class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-md px-6 py-4 w-full fixed">
     <div class="max-w-full flex justify-between items-center">
       <div class="flex items-center space-x-3">
-        <img src="images/transparent-logo.png" alt="Logo" class="w-8 h-8" />
+        <img src="../images/transparent-logo.png" alt="Logo" class="w-8 h-8" />
         <span class="text-xl font-semibold text-gray-800 dark:text-white">Attentify</span>
       </div>
       <div class="flex items-center gap-4">
@@ -35,7 +35,7 @@
 <div class="flex items-center justify-center min-h-screen">
   <div class="bg-white dark:bg-gray-800 shadow-2xl rounded-2xl p-8 max-w-md w-full border border-gray-200 dark:border-gray-700">
     <div class="flex justify-center mb-6 space-x-4">
-      <button onclick="showTab('login')" id="loginTab" class="text-sm font-medium px-4 py-2 rounded-full bg-sky-600 text-white">Login</button>
+      <button onclick="showTab('login')" id="loginTab" class="text-sm font-medium px-4 py-2 rounded-full bg-indigo-600 text-white">Login</button>
       <button onclick="showTab('register')" id="registerTab" class="text-sm font-medium px-4 py-2 rounded-full bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200">Register</button>
     </div>
 
@@ -43,26 +43,26 @@
     <form id="loginForm" onsubmit="return false" class="space-y-4">
       <h2 class="text-2xl font-bold text-center text-gray-800 dark:text-white">Company Login</h2>
       <input type="text" id="loginUsername" placeholder="Username"
-        class="w-full px-4 py-2 border rounded-full dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500" autofocus>
+        class="w-full px-4 py-2 border rounded-full dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" autofocus>
       <input type="password" placeholder="Password"
-        class="w-full px-4 py-2 border rounded-full dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+        class="w-full px-4 py-2 border rounded-full dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
       <button
-        class="w-full bg-sky-600 text-white py-2 rounded-full hover:bg-sky-700 transition">Login</button>
+        class="w-full bg-indigo-600 text-white py-2 rounded-full hover:bg-sky-700 transition">Login</button>
     </form>
 
     <!-- Register Form -->
     <form id="registerForm" onsubmit="return false" class="space-y-4 hidden">
       <h2 class="text-2xl font-bold text-center text-gray-800 dark:text-white">Company Register</h2>
       <input type="text" placeholder="Company Name"
-        class="w-full px-4 py-2 border rounded-full dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+        class="w-full px-4 py-2 border rounded-full dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
       <input type="text" placeholder="Username"
-        class="w-full px-4 py-2 border rounded-full dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+        class="w-full px-4 py-2 border rounded-full dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
       <input type="email" placeholder="Email"
-        class="w-full px-4 py-2 border rounded-full dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+        class="w-full px-4 py-2 border rounded-full dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
       <input type="password" placeholder="Password"
-        class="w-full px-4 py-2 border rounded-full dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+        class="w-full px-4 py-2 border rounded-full dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
       <button
-        class="w-full bg-sky-600 text-white py-2 rounded-full hover:bg-sky-700 transition">Register</button>
+        class="w-full bg-indigo-600 text-white py-2 rounded-full hover:bg-sky-700 transition">Register</button>
     </form>
   </div>
   </div>
@@ -77,17 +77,17 @@
       if (tab === 'login') {
         loginForm.classList.remove('hidden');
         registerForm.classList.add('hidden');
-        loginTab.classList.add('bg-sky-600', 'text-white');
+        loginTab.classList.add('bg-indigo-600', 'text-white');
         loginTab.classList.remove('bg-gray-300', 'dark:bg-gray-700', 'text-gray-800', 'dark:text-gray-200');
-        registerTab.classList.remove('bg-sky-600', 'text-white');
+        registerTab.classList.remove('bg-indigo-600', 'text-white');
         registerTab.classList.add('bg-gray-300', 'dark:bg-gray-700', 'text-gray-800', 'dark:text-gray-200');
         setTimeout(() => document.getElementById('loginUsername').focus(), 100);
       } else {
         loginForm.classList.add('hidden');
         registerForm.classList.remove('hidden');
-        registerTab.classList.add('bg-sky-600', 'text-white');
+        registerTab.classList.add('bg-indigo-600', 'text-white');
         registerTab.classList.remove('bg-gray-300', 'dark:bg-gray-700', 'text-gray-800', 'dark:text-gray-200');
-        loginTab.classList.remove('bg-sky-600', 'text-white');
+        loginTab.classList.remove('bg-indigo-600', 'text-white');
         loginTab.classList.add('bg-gray-300', 'dark:bg-gray-700', 'text-gray-800', 'dark:text-gray-200');
       }
     }

@@ -26,7 +26,7 @@
   <nav class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-md px-6 py-4 w-full fixed">
     <div class="max-w-full flex justify-between items-center">
       <div class="flex items-center space-x-3">
-        <img src="images/transparent-logo.png" alt="Logo" class="w-8 h-8" />
+        <img src="../images/transparent-logo.png" alt="Logo" class="w-8 h-8" />
         <span class="text-xl font-semibold text-gray-800 dark:text-white">Attentify</span>
       </div>
       <div class="flex items-center gap-4">
@@ -44,7 +44,7 @@
   <div class="flex items-center justify-center min-h-screen">
     <div class="w-full max-w-md bg-white dark:bg-gray-800 shadow-2xl rounded-2xl p-8 transition">
       <div class="flex items-center justify-center mb-8">
-        <img src="./images/transparent-logo.png" alt="logo" class="h-12 me-3 object-cover">
+        <img src="../images/transparent-logo.png" alt="logo" class="h-12 me-3 object-cover">
         <p class="text-3xl font-bold text-gray-800 dark:text-white">Attendify</p>
       </div>
       <form id="loginForm" onsubmit="return handleLogin(event)">
@@ -83,7 +83,7 @@
       const empId = document.getElementById('emp_id').value.trim();
 
       if (empId === "admin") {
-        window.location.href = "admin-dashboard/dashboard.php";
+        window.location.href = "../admin-dashboard/dashboard.php";
         return;
       }
       if (!empId) return;
