@@ -1,0 +1,81 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['company_id'])) {
+    header("Location: ../main/company-login.php");
+    exit();
+}
+?>
+
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Device Setup</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
+
+  <style>
+    .split-background {
+      background: linear-gradient(to right, #4F46E5 50%, #10B981 50%);
+    }
+  </style>
+</head>
+
+<body class="bg-white dark:bg-gray-900 font-sans h-screen flex flex-col transition-colors duration-300">
+    
+    <nav class="bg-white dark:bg-gray-800 shadow-md border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+        <div class="max-w-full flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <img src="../images/transparent-logo.png" alt="Logo" class="w-8 h-8" />
+                <span class="text-xl font-semibold text-gray-800 dark:text-white">Attentify Setup</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleTheme()" title="Toggle Dark Mode"
+                    class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-white transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 3v1m0 16v1m8.66-8.66h1M3.34 12H2.34m15.36 4.24l.71.71M6.34 6.34l-.71-.71m12.02-.02l-.71.71M6.34 17.66l.71-.71M21 12a9 9 0 11-9-9c.34 0 .68.02 1.01.06a7 7 0 008.93 8.94c.04.33.06.67.06 1z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex-1 flex text-center bg-white">
+        <a href="process_device_setup.php?type=admin" class="group flex-1 flex flex-col justify-center items-center p-8 bg-white dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300 border-r border-gray-200 dark:border-gray-700">
+            <img src="../images/analyze-data.svg" alt="Admin Dashboard" class="w-2/3 max-w-sm h-auto mb-6 transition-transform duration-300 group-hover:scale-105">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Admin Dashboard</h2>
+            <p class="text-gray-500 dark:text-gray-400 max-w-sm">Use this device to manage employees, view reports, and configure company settings.</p>
+        </a>
+        
+        <a href="process_device_setup.php?type=punchin" class="group flex-1 flex flex-col justify-center items-center p-8 bg-white dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300">
+            <img src="../images/digital-nomad-working-in-airport.png" alt="Punch-in Device" class="w-2/3 max-w-sm h-auto mb-6 transition-transform duration-300 group-hover:scale-105">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Punch-in Device</h2>
+            <p class="text-gray-500 dark:text-gray-400 max-w-sm">Set this as the main station for employees to punch in and out for their shifts.</p>
+        </a>
+    </div>
+
+    <script>
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+  </script>
+  <script>
+    // On page load, set dark mode based on saved preference
+    if (localStorage.getItem('theme') === 'dark' ||
+      (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  </script>
+</body>
+</html>

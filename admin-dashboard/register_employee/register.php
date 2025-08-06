@@ -1,20 +1,24 @@
 <?php
-// Connect to database
+session_start();
 $host = "localhost";
 $user = "root";
 $pass = "";
 $dbname = "attendance-db";
 
+if (!isset($_SESSION['company_id'])) {
+  header('Location: ../../main/company-login.php');
+  exit;
+}
+$company_id = $_SESSION['company_id'];
+
 $conn = new mysqli($host, $user, $pass, $dbname);
 
-// Check connection
 if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch roles
 $roles = [];
-$role_sql = "SELECT id, name FROM roles";
+$role_sql = "SELECT id, name FROM roles WHERE company_id = $company_id";
 $result = $conn->query($role_sql);
 if ($result && $result->num_rows > 0) {
   while ($row = $result->fetch_assoc()) {
@@ -22,9 +26,8 @@ if ($result && $result->num_rows > 0) {
   }
 }
 
-// Fetch departments
 $departments = [];
-$dept_sql = "SELECT department_id, dept_name FROM departments";
+$dept_sql = "SELECT department_id, dept_name FROM departments WHERE company_id = $company_id";
 $result = $conn->query($dept_sql);
 if ($result && $result->num_rows > 0) {
   while ($row = $result->fetch_assoc()) {
@@ -32,7 +35,6 @@ if ($result && $result->num_rows > 0) {
   }
 }
 
-// Insert logic
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $first_name = $_POST["first_name"];
   $middle_name = $_POST["middle_name"];
@@ -46,7 +48,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $department_id = $_POST["department"];
   $gender = $_POST["gender"];
   $password = $_POST["password"];
-  $company_id = 1; // Assuming a single company for now
 
   $stmt = $conn->prepare("INSERT INTO employees (first_name, middle_name, last_name, email, phone_num, birth_date, hire_date, salary, role, department_id, gender, password, company_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
   $stmt->bind_param("sssssssdiissi", $first_name, $middle_name, $last_name, $email, $phone_num, $birth_date, $hire_date, $salary, $role_id, $department_id, $gender, $password, $company_id);
@@ -66,22 +67,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   <meta charset="UTF-8">
   <title>Register Employee</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-
-  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css"
+    integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    };
+  </script>
 </head>
 
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
   <nav class="bg-white dark:bg-gray-800 shadow-md border-b border-gray-200 dark:border-gray-700 px-6 py-4">
     <div class="max-w-full flex justify-between items-center">
-
       <div class="flex items-center space-x-3">
         <img src="../../images/transparent-logo.png" alt="Logo" class="w-8 h-8" />
         <span class="text-xl font-semibold text-gray-800 dark:text-white">Attentify Dashboard</span>
       </div>
-
       <div class="flex items-center gap-4">
-        <button onclick="document.documentElement.classList.toggle('dark')" title="Toggle Dark Mode"
+        <button onclick="toggleTheme()" title="Toggle Dark Mode"
           class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white transition">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
             stroke-width="2">
@@ -89,128 +93,161 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
               d="M12 3v1m0 16v1m8.66-8.66h1M3.34 12H2.34m15.36 4.24l.71.71M6.34 6.34l-.71-.71m12.02-.02l-.71.71M6.34 17.66l.71-.71M21 12a9 9 0 11-9-9c.34 0 .68.02 1.01.06a7 7 0 008.93 8.94c.04.33.06.67.06 1z" />
           </svg>
         </button>
-
         <div
           class="w-9 h-9 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-700 dark:text-white">
           <i class="fa-solid fa-user text-sm"></i>
         </div>
       </div>
-
     </div>
   </nav>
-  <div class="container mx-auto my-8 px-4">
-    <div class="max-w-5xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-      <h2 class="text-2xl font-bold text-center mb-2">Register Employee</h2>
-      <p class="text-center text-gray-600 dark:text-gray-300 mb-6">Fill in the details below</p>
-      <form action="register.php" method="post" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div>
-          <label class="block mb-1">First Name</label>
-          <input type="text" name="first_name"
-            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
-            required>
-        </div>
-        <div>
-          <label class="block mb-1">Middle Name</label>
-          <input type="text" name="middle_name"
-            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900">
-        </div>
-        <div>
-          <label class="block mb-1">Last Name</label>
-          <input type="text" name="last_name"
-            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
-            required>
-        </div>
+  <div class="flex">
+    <aside
+      class="w-64 bg-white dark:bg-gray-800 p-6 shadow-md md:block min-h-screen border-r border-gray-200 dark:border-gray-700">
+      <ul class="space-y-3">
+        <li>
+          <a href="../reports.php"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+            <i class="fa-solid fa-chart-simple text-lg"></i>
+            <span>Attendance Report</span>
+          </a>
+        </li>
+        <li>
+          <a href="../dashboard.php"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+            <i class="fa-solid fa-tablet text-lg"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a href="../company_info.php"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+            <i class="fa-solid fa-user-gear text-lg"></i>
+            <span>Company Info</span>
+          </a>
+        <li>
+          <a href="#"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl bg-indigo-100 dark:bg-indigo-900 font-semibold text-indigo-800 dark:text-indigo-200">
+            <i class="fa-solid fa-user-plus text-lg"></i>
+            <span>Add Employee</span>
+          </a>
+        </li>
+        </li>
+      </ul>
+    </aside>
 
-        <div>
-          <label class="block mb-1">Email</label>
-          <input type="email" name="email"
-            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 invalid:border-pink-500 invalid:text-pink-600 focus:border-sky-500 focus:outline focus:outline-sky-500 focus:invalid:border-pink-500 focus:invalid:outline-pink-500"
-            required>
-        </div>
-        <div>
-          <label class="block mb-1">Phone Number</label>
-          <input type="tel" name="phone_num"
-            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 invalid:border-pink-500 invalid:text-pink-600 focus:border-sky-500 focus:outline focus:outline-sky-500 focus:invalid:border-pink-500 focus:invalid:outline-pink-500"
-            required>
-        </div>
+    <main class="container mx-auto my-8 px-4">
+      <div class="max-w-5xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h2 class="text-2xl font-bold text-center mb-2">Register Employee</h2>
+        <p class="text-center text-gray-600 dark:text-gray-300 mb-6">Fill in the details below</p>
+        <form action="register.php" method="post" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div>
+            <label class="block mb-1">First Name</label>
+            <input type="text" name="first_name"
+              class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+              required>
+          </div>
+          <div>
+            <label class="block mb-1">Middle Name</label>
+            <input type="text" name="middle_name"
+              class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900">
+          </div>
+          <div>
+            <label class="block mb-1">Last Name</label>
+            <input type="text" name="last_name"
+              class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+              required>
+          </div>
 
-        <div>
-          <label class="block mb-1">Birth Date</label>
-          <input type="date" name="birth_date"
-            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
-            required>
-        </div>
-        <div>
-          <label class="block mb-1">Hire Date</label>
-          <input type="date" name="hire_date"
-            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
-            required>
-        </div>
+          <div>
+            <label class="block mb-1">Email</label>
+            <input type="email" name="email"
+              class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 invalid:border-pink-500 invalid:text-pink-600 focus:border-sky-500 focus:outline focus:outline-sky-500 focus:invalid:border-pink-500 focus:invalid:outline-pink-500"
+              required>
+          </div>
+          <div>
+            <label class="block mb-1">Phone Number</label>
+            <input type="tel" name="phone_num"
+              class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 invalid:border-pink-500 invalid:text-pink-600 focus:border-sky-500 focus:outline focus:outline-sky-500 focus:invalid:border-pink-500 focus:invalid:outline-pink-500"
+              required>
+          </div>
 
-        <div>
-          <label
-            class="block mb-1">Salary</label>
-          <input type="number" name="salary"
-            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 invalid:border-pink-500 invalid:text-pink-600 focus:border-sky-500 focus:outline focus:outline-sky-500 focus:invalid:border-pink-500 focus:invalid:outline-pink-500"
-            required>
-        </div>
+          <div>
+            <label class="block mb-1">Birth Date</label>
+            <input type="date" name="birth_date"
+              class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+              required>
+          </div>
+          <div>
+            <label class="block mb-1">Hire Date</label>
+            <input type="date" name="hire_date"
+              class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+              required>
+          </div>
 
-        <div>
-          <label class="block mb-1">Role</label>
-          <select name="role"
-            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
-            required>
-            <option value="">Select Role</option>
-            <?php foreach ($roles as $role): ?>
-              <option value="<?= $role['id'] ?>"><?= htmlspecialchars($role['name']) ?></option>
-            <?php endforeach; ?>
-          </select>
-        </div>
+          <div>
+            <label class="block mb-1">Salary</label>
+            <input type="number" name="salary"
+              class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 invalid:border-pink-500 invalid:text-pink-600 focus:border-sky-500 focus:outline focus:outline-sky-500 focus:invalid:border-pink-500 focus:invalid:outline-pink-500"
+              required>
+          </div>
 
-        <div>
-          <label class="block mb-1">Department</label>
-          <select name="department"
-            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
-            required>
-            <option value="">Select Department</option>
-            <?php foreach ($departments as $dept): ?>
-              <option value="<?= $dept['department_id'] ?>"><?= htmlspecialchars($dept['dept_name']) ?></option>
-            <?php endforeach; ?>
-          </select>
-        </div>
+          <div>
+            <label class="block mb-1">Role</label>
+            <select name="role"
+              class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+              required>
+              <option value="">Select Role</option>
+              <?php foreach ($roles as $role): ?>
+                <option value="<?= $role['id'] ?>"><?= htmlspecialchars($role['name']) ?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
 
-        <div>
-          <label class="block mb-1">Gender</label>
-          <select name="gender"
-            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
-            required>
-            <option value="">Select Gender</option>
-            <option>Male</option>
-            <option>Female</option>
-            <option>Other</option>
-          </select>
-        </div>
+          <div>
+            <label class="block mb-1">Department</label>
+            <select name="department"
+              class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+              required>
+              <option value="">Select Department</option>
+              <?php foreach ($departments as $dept): ?>
+                <option value="<?= $dept['department_id'] ?>"><?= htmlspecialchars($dept['dept_name']) ?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
 
-        <div>
-          <label class="block mb-1">Password</label>
-          <input type="password" name="password" id="password"
-            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
-            required>
-        </div>
+          <div>
+            <label class="block mb-1">Gender</label>
+            <select name="gender"
+              class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+              required>
+              <option value="">Select Gender</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+            </select>
+          </div>
 
-        <div class="col-span-full">
-          <label class="inline-flex items-center">
-            <input type="checkbox" id="showPass" class="form-checkbox text-blue-600">
-            <span class="ml-2">Show Password</span>
-          </label>
-        </div>
+          <div>
+            <label class="block mb-1">Password</label>
+            <input type="password" name="password" id="password"
+              class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+              required>
+          </div>
 
-        <div class="col-span-full text-center">
-          <button type="submit"
-            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded">Register</button>
-        </div>
-      </form>
-    </div>
+          <div class="col-span-full">
+            <label class="inline-flex items-center">
+              <input type="checkbox" id="showPass" class="form-checkbox text-blue-600">
+              <span class="ml-2">Show Password</span>
+            </label>
+          </div>
+
+          <div class="col-span-full text-center">
+            <button type="submit"
+              class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded">Register</button>
+          </div>
+        </form>
+      </div>
+    </main>
   </div>
 
   <script>
@@ -221,7 +258,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     });
   </script>
   <script>
-    // On page load, set dark mode based on saved preference
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
     if (localStorage.getItem('theme') === 'dark' ||
       (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
@@ -229,7 +269,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       document.documentElement.classList.remove('dark');
     }
   </script>
-
 </body>
 
 </html>

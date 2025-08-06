@@ -93,7 +93,7 @@ $conn->close();
 
 <body>
     <h1>Punch - <?php echo $status ?> Successful</h1>
-    <img src="./Images/Group 1.png" alt="Tick">
+    <img src="../images/Group 1.png" alt="Tick">
     <div>
         <p>Employee Name : <?php echo $first_name ?></p>
         <p>Employee ID : <?php echo $emp_id ?></p>

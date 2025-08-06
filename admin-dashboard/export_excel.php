@@ -1,8 +1,17 @@
 <?php
+session_start();
 $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "attendance-db";
+
+// Check if the user is logged in
+if (!isset($_SESSION['company_id'])) {
+    die("Unauthorized access.");
+}
+
+// Get company ID from the session
+$company_id = $_SESSION['company_id'];
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
@@ -16,9 +25,9 @@ $search = $_GET['search'] ?? '';
 $sort = $_GET['sort'] ?? 'in_time';
 $order = $_GET['order'] ?? 'asc';
 
-$where = [];
-$paramTypes = '';
-$params = [];
+$where = ["company_id = ?"];
+$paramTypes = 'i';
+$params = [$company_id];
 
 if (!empty($from) && !empty($to)) {
   $where[] = "DATE(in_time) BETWEEN ? AND ?";
@@ -35,7 +44,7 @@ if (!empty($status)) {
 if (!empty($search)) {
   $where[] = "employee_id = ?";
   $params[] = $search;
-  $paramTypes .= 's';
+  $paramTypes .= 'i';
 }
 
 $whereClause = count($where) ? 'WHERE ' . implode(' AND ', $where) : '';
@@ -48,7 +57,7 @@ if (!empty($params)) {
 }
 
 if (!$stmt->execute()) {
-    die("Error executing statement: " . $stmt->error);
+    die("Error executing statement: " . $conn->error);
 }
 
 $result = $stmt->get_result();
@@ -58,7 +67,6 @@ header("Content-Disposition: attachment; filename=attendance_report.xls");
 header("Pragma: no-cache");
 header("Expires: 0");
 
-// Output Excel table
 echo "<table border='1'>";
 echo "<tr><th>Employee ID</th><th>Date</th><th>Time In</th><th>Time Out</th><th>Working Hours</th></tr>";
 

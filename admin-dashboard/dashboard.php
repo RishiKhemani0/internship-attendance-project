@@ -1,16 +1,21 @@
 <?php
+session_start();
 $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "attendance-db";
 
-// Create connection and check for errors
+if (!isset($_SESSION['company_id'])) {
+  header('Location: ../main/company-login.php');
+  exit;
+}
+$company_id = $_SESSION['company_id'];
+
 $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
-// Function to get a consistent color for roles based on a hash
 function getRoleColorClass($roleName)
 {
   $colors = [
@@ -28,23 +33,18 @@ function getRoleColorClass($roleName)
   return $colors[$index];
 }
 
-// Fetch all roles for the filter dropdown
-$rolesResult = $conn->query("SELECT id, name FROM roles");
+$rolesResult = $conn->query("SELECT id, name FROM roles WHERE company_id = $company_id");
 if ($rolesResult === false) {
-    die("Error fetching roles: " . $conn->error);
+  die("Error fetching roles: " . $conn->error);
 }
-
-// Fetch all departments for the filter dropdown
-$departmentsResult = $conn->query("SELECT department_id, dept_name FROM departments");
+$departmentsResult = $conn->query("SELECT department_id, dept_name FROM departments WHERE company_id = $company_id");
 if ($departmentsResult === false) {
-    die("Error fetching departments: " . $conn->error);
+  die("Error fetching departments: " . $conn->error);
 }
-
-// Fetch min and max salary for dynamic salary coloring
-$salaryRangeQuery = "SELECT MIN(salary) as min_salary, MAX(salary) as max_salary FROM employees";
+$salaryRangeQuery = "SELECT MIN(salary) as min_salary, MAX(salary) as max_salary FROM employees WHERE company_id = $company_id";
 $rangeResult = $conn->query($salaryRangeQuery);
 if ($rangeResult === false) {
-    die("Error fetching salary range: " . $conn->error);
+  die("Error fetching salary range: " . $conn->error);
 }
 $rangeData = $rangeResult->fetch_assoc();
 $minSalary = $rangeData['min_salary'];
@@ -61,8 +61,8 @@ function getSalaryColor($salary, $min, $max)
 }
 
 $filters = [];
-$params = [];
-$paramTypes = '';
+$params = [$company_id];
+$paramTypes = 'i';
 
 if (!empty($_GET['role'])) {
   $filters[] = 'e.role = ?';
@@ -87,11 +87,13 @@ if (!empty($_GET['search_emp_id'])) {
 
 $sql = "SELECT e.employee_id, CONCAT(e.first_name, ' ', e.middle_name, ' ', e.last_name) AS full_name, r.name AS role, e.salary
         FROM employees e
-        JOIN roles r ON e.role = r.id";
+        JOIN roles r ON e.role = r.id
+        WHERE e.company_id = ?";
 
 if (!empty($filters)) {
-  $sql .= " WHERE " . implode(" AND ", $filters);
+  $sql .= " AND " . implode(" AND ", $filters);
 }
+$sql .= " ORDER BY e.employee_id ASC";
 
 $stmt = $conn->prepare($sql);
 
@@ -101,6 +103,8 @@ if ($stmt === false) {
 
 if (!empty($filters)) {
   $stmt->bind_param($paramTypes, ...$params);
+} else {
+  $stmt->bind_param($paramTypes, $company_id);
 }
 
 if (!$stmt->execute()) {
@@ -154,13 +158,13 @@ $result = $stmt->get_result();
       </form>
 
       <div class="flex items-center gap-4">
-        <button onclick="document.documentElement.classList.toggle('dark')" title="Toggle Dark Mode"
+        <button onclick="toggleTheme()" title="Toggle Dark Mode"
           class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-white transition">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
             stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round"
               d="M12 3v1m0 16v1m8.66-8.66h1M3.34 12H2.34m15.36 4.24l.71.71M6.34 6.34l-.71-.71m12.02-.02l-.71.71M6.34 17.66l.71-.71M21 12a9 9 0 11-9-9c.34 0 .68.02 1.01.06a7 7 0 008.93 8.94c.04.33.06.67.06 1z" />
-            </svg>
+          </svg>
         </button>
 
         <div
@@ -190,11 +194,18 @@ $result = $stmt->get_result();
           </a>
         </li>
         <li>
-          <a href="#"
+          <a href="./company_info.php"
             class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition">
             <i class="fa-solid fa-user-gear text-lg"></i>
             <span>Company Info</span>
           </a>
+        <li>
+          <a href="./register_employee/register.php"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+            <i class="fa-solid fa-user-plus text-lg"></i>
+            <span>Add Employee</span>
+          </a>
+        </li>
         </li>
       </ul>
     </aside>
@@ -211,11 +222,11 @@ $result = $stmt->get_result();
               <option value="">All Roles</option>
               <?php
               if ($rolesResult->num_rows > 0) {
-                  $rolesResult->data_seek(0);
-                  while ($role = $rolesResult->fetch_assoc()) {
-                      $selected = isset($_GET['role']) && $_GET['role'] == $role['id'] ? 'selected' : '';
-                      echo "<option value='{$role['id']}' $selected>{$role['name']}</option>";
-                  }
+                $rolesResult->data_seek(0);
+                while ($role = $rolesResult->fetch_assoc()) {
+                  $selected = isset($_GET['role']) && $_GET['role'] == $role['id'] ? 'selected' : '';
+                  echo "<option value='{$role['id']}' $selected>{$role['name']}</option>";
+                }
               }
               ?>
             </select>
@@ -228,11 +239,11 @@ $result = $stmt->get_result();
               <option value="">All Departments</option>
               <?php
               if ($departmentsResult->num_rows > 0) {
-                  $departmentsResult->data_seek(0);
-                  while ($dept = $departmentsResult->fetch_assoc()) {
-                      $selected = isset($_GET['department']) && $_GET['department'] == $dept['department_id'] ? 'selected' : '';
-                      echo "<option value='{$dept['department_id']}' $selected>{$dept['dept_name']}</option>";
-                  }
+                $departmentsResult->data_seek(0);
+                while ($dept = $departmentsResult->fetch_assoc()) {
+                  $selected = isset($_GET['department']) && $_GET['department'] == $dept['department_id'] ? 'selected' : '';
+                  echo "<option value='{$dept['department_id']}' $selected>{$dept['dept_name']}</option>";
+                }
               }
               ?>
             </select>
@@ -244,7 +255,8 @@ $result = $stmt->get_result();
               <option value="">All Genders</option>
               <option value="Male" <?= (isset($_GET['gender']) && $_GET['gender'] == 'Male') ? 'selected' : '' ?>>Male
               </option>
-              <option value="Female" <?= (isset($_GET['gender']) && $_GET['gender'] == 'Female') ? 'selected' : '' ?>>Female
+              <option value="Female" <?= (isset($_GET['gender']) && $_GET['gender'] == 'Female') ? 'selected' : '' ?>>
+                Female
               </option>
               <option value="Other" <?= (isset($_GET['gender']) && $_GET['gender'] == 'Other') ? 'selected' : '' ?>>Other
               </option>
@@ -255,7 +267,7 @@ $result = $stmt->get_result();
               class="w-full bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition">Apply
               Filters</button>
             <a href="dashboard.php"
-              class="w-full bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white px-4 py-2 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 text-center transition">Reset</a>
+              class="w-full bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white px-4 py-2 rounded-xl text-center hover:bg-gray-300 dark:hover:bg-gray-600 transition">Reset</a>
           </div>
         </div>
       </form>
@@ -303,7 +315,6 @@ $result = $stmt->get_result();
   </div>
 
   <script>
-    // On page load, set dark mode based on saved preference
     function toggleTheme() {
       const isDark = document.documentElement.classList.toggle('dark');
       localStorage.setItem('theme', isDark ? 'dark' : 'light');

@@ -1,12 +1,19 @@
 <?php
+session_start();
 $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "attendance-db";
 
+if (!isset($_SESSION['company_id'])) {
+    header('Location: ../main/company-login.php');
+    exit;
+}
+$company_id = $_SESSION['company_id'];
+
 $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
-  die("Connection failed: " . $conn->connect_error);
+    die("Connection failed: " . $conn->connect_error);
 }
 
 // Get the number of working days in the current month
@@ -16,36 +23,37 @@ $workingDays = 0;
 for ($i = 1; $i <= $daysInMonth; $i++) {
     $date = new DateTime("$currentMonth-$i");
     $dayOfWeek = $date->format('N');
-    if ($dayOfWeek < 6) { // 1 to 5 are Monday to Friday
+    if ($dayOfWeek < 6) {
         $workingDays++;
     }
 }
 
-$dateFilter = "";
+$dateFilter = " WHERE attendance.company_id = $company_id";
 if (!empty($_GET['from']) && !empty($_GET['to'])) {
     $from = $conn->real_escape_string($_GET['from']);
     $to = $conn->real_escape_string($_GET['to']);
-    $dateFilter = " WHERE DATE(in_time) BETWEEN '$from' AND '$to'";
+    $dateFilter .= " AND DATE(in_time) BETWEEN '$from' AND '$to'";
 }
 
 $statsQuery = "
-  SELECT 
-    DATE(in_time) as attendance_date,
-    SUM(CASE WHEN status = 'on-time' THEN 1 ELSE 0 END) AS on_time,
-    SUM(CASE WHEN status = 'late' THEN 1 ELSE 0 END) AS late
-  FROM attendance
-  $dateFilter
-  GROUP BY attendance_date
-  ORDER BY attendance_date ASC
+    SELECT 
+      DATE(in_time) as attendance_date,
+      SUM(CASE WHEN status = 'on-time' THEN 1 ELSE 0 END) AS on_time,
+      SUM(CASE WHEN status = 'late' THEN 1 ELSE 0 END) AS late
+    FROM attendance
+    $dateFilter
+    GROUP BY attendance_date
+    ORDER BY attendance_date ASC
 ";
 
 $monthlyStatsQuery = "
-  SELECT 
-    DATE_FORMAT(in_time, '%Y-%m') AS month,
-    COUNT(DISTINCT employee_id) AS present_employees
-  FROM attendance
-  GROUP BY month
-  ORDER BY month ASC
+    SELECT 
+      DATE_FORMAT(in_time, '%Y-%m') AS month,
+      COUNT(DISTINCT employee_id) AS present_employees
+    FROM attendance
+    WHERE company_id = $company_id
+    GROUP BY month
+    ORDER BY month ASC
 ";
 
 $statsResult = $conn->query($statsQuery);
@@ -63,22 +71,22 @@ $onTimeData = [];
 $lateData = [];
 
 while ($row = $statsResult->fetch_assoc()) {
-  $dates[] = $row['attendance_date'];
-  $onTimeData[] = (int) $row['on_time'];
-  $lateData[] = (int) $row['late'];
+    $dates[] = $row['attendance_date'];
+    $onTimeData[] = (int) $row['on_time'];
+    $lateData[] = (int) $row['late'];
 }
 
 $months = [];
 $monthlyPercentages = [];
-$totalEmployees = $conn->query("SELECT COUNT(*) FROM employees")->fetch_row()[0];
+$totalEmployees = $conn->query("SELECT COUNT(*) FROM employees WHERE company_id = $company_id")->fetch_row()[0];
 
 while ($row = $monthlyResult->fetch_assoc()) {
-  $months[] = $row['month'];
-  if ($totalEmployees > 0) {
-      $monthlyPercentages[] = round(($row['present_employees'] / $totalEmployees) * 100, 2);
-  } else {
-      $monthlyPercentages[] = 0;
-  }
+    $months[] = $row['month'];
+    if ($totalEmployees > 0) {
+        $monthlyPercentages[] = round(($row['present_employees'] / $totalEmployees) * 100, 2);
+    } else {
+        $monthlyPercentages[] = 0;
+    }
 }
 ?>
 
@@ -99,34 +107,62 @@ while ($row = $monthlyResult->fetch_assoc()) {
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans transition-all duration-300">
 
-  <nav class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-md px-6 py-4">
-    <div class="max-w-full flex justify-between items-center">
-      <div class="flex items-center space-x-3">
-        <img src="../images/transparent-logo.png" alt="Logo" class="w-8 h-8" />
-        <span class="text-xl font-semibold text-gray-800 dark:text-white">Attentify Reports</span>
-      </div>
-      <div class="flex items-center gap-4">
-        <button onclick="document.documentElement.classList.toggle('dark')" title="Toggle Dark Mode"
-          class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-white transition">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M12 3v1m0 16v1m8.66-8.66h1M3.34 12H2.34m15.36 4.24l.71.71M6.34 6.34l-.71-.71m12.02-.02l-.71.71M6.34 17.66l.71-.71M21 12a9 9 0 11-9-9c.34 0 .68.02 1.01.06a7 7 0 008.93 8.94c.04.33.06.67.06 1z" />
-          </svg>
-        </button>
-        <a href="./register_employee/register.php" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded shadow text-sm font-medium">
-          + Add Employee
-        </a>
-      </div>
-    </div>
-  </nav>
+  <nav class="bg-white dark:bg-gray-800 shadow-md border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+        <div class="max-w-full flex justify-between items-center">
+          <a class="flex items-center space-x-3" href="dashboard.php">
+            <img src="../images/transparent-logo.png" alt="Logo" class="w-8 h-8" />
+            <span class="text-xl font-semibold text-gray-800 dark:text-white">Attentify Dashboard</span>
+          </a>
+
+          <div class="flex items-center gap-4">
+            <button onclick="toggleTheme()" title="Toggle Dark Mode"
+              class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-white transition">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 3v1m0 16v1m8.66-8.66h1M3.34 12H2.34m15.36 4.24l.71.71M6.34 6.34l-.71-.71m12.02-.02l-.71.71M6.34 17.66l.71-.71M21 12a9 9 0 11-9-9c.34 0 .68.02 1.01.06a7 7 0 008.93 8.94c.04.33.06.67.06 1z" />
+                </svg>
+            </button>
+
+            <div
+              class="w-9 h-9 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-700 dark:text-white">
+              <i class="fa-solid fa-user text-sm"></i>
+            </div>
+          </div>
+        </div>
+      </nav>
 
   <div class="flex">
-    <aside class="w-64 bg-white dark:bg-gray-800 p-6 border-r border-gray-200 dark:border-gray-700 hidden md:block">
-      <ul class="space-y-4">
-        <li><a href="./reports.php" class="block px-4 py-2 rounded bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-white font-medium"><i class="fa-solid nav-icon fa-chart-simple"></i> Attendance Report</a></li>
-        <li><a href="./dashboard.php" class="block px-4 py-2 rounded hover:bg-indigo-50 dark:hover:bg-gray-700"><i class="fa-solid nav-icon fa-tablet"></i> Dashboard</a></li>
-        <li><a href="#" class="block px-4 py-2 rounded hover:bg-indigo-50 dark:hover:bg-gray-700"><i class="fa-solid nav-icon fa-user"></i> Company Info</a></li>
+    <aside class="w-64 bg-white dark:bg-gray-800 p-6 shadow-md md:block min-h-screen border-r border-gray-200 dark:border-gray-700">
+      <ul class="space-y-3">
+        <li>
+          <a href="./reports.php"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl bg-indigo-100 dark:bg-indigo-900 font-semibold text-indigo-800 dark:text-indigo-200">
+            <i class="fa-solid fa-chart-simple text-lg"></i>
+            <span>Attendance Report</span>
+          </a>
+        </li>
+        <li>
+          <a href="./dashboard.php"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+            <i class="fa-solid fa-tablet text-lg"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a href="./company_info.php"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+            <i class="fa-solid fa-user-gear text-lg"></i>
+            <span>Company Info</span>
+          </a>
+        </li>
+        <li>
+          <a href="./register_employee/register.php"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+            <i class="fa-solid fa-user-plus text-lg"></i>
+            <span>Add Employee</span>
+          </a>
+        </li>
       </ul>
     </aside>
 
@@ -248,18 +284,17 @@ while ($row = $monthlyResult->fetch_assoc()) {
   </script>
 
   <script>
-  // On page load, set dark mode based on saved preference
-  function toggleTheme() {
-    const isDark = document.documentElement.classList.toggle('dark');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-  }
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
 
-  if (localStorage.getItem('theme') === 'dark' ||
-     (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-    document.documentElement.classList.add('dark');
-  } else {
-    document.documentElement.classList.remove('dark');
-  }
-</script>
+    if (localStorage.getItem('theme') === 'dark' ||
+       (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  </script>
 </body>
 </html>

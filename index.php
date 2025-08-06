@@ -1,3 +1,14 @@
+<?php
+session_start();
+if (isset($_SESSION['company_id'])) {
+    if (!isset($_SESSION['device_type'])) {
+        header('Location: admin-dashboard/device_setup.php');
+    } else {
+        header('Location: ' . ($_SESSION['device_type'] === 'admin' ? 'admin-dashboard/dashboard.php' : 'main/index.php'));
+    }
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -7,7 +18,6 @@
     <title>Attentify - Smart Attendance Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom styles for gradients and animations */
         .bg-hero {
             background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
         }
