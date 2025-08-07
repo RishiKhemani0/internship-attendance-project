@@ -1,10 +1,19 @@
 <?php
+session_start();
 header('Content-Type: application/json');
 
 $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "attendance-db";
+
+// Check if company ID is set in the session
+if (!isset($_SESSION['company_id'])) {
+    echo json_encode(["error" => "Company not authenticated."]);
+    exit();
+}
+
+$company_id = $_SESSION['company_id'];
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -31,13 +40,13 @@ $sql = "SELECT
           a.in_time
         FROM employees e
         JOIN roles r ON e.role = r.id
-        LEFT JOIN attendance a ON e.employee_id = a.employee_id AND a.out_time IS NULL
-        WHERE e.employee_id = ?
+        LEFT JOIN attendance a ON e.employee_id = a.employee_id AND a.out_time IS NULL AND a.company_id = ?
+        WHERE e.employee_id = ? AND e.company_id = ?
         ORDER BY a.in_time DESC
         LIMIT 1"; 
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $employee_id);
+$stmt->bind_param("iii", $company_id, $employee_id, $company_id);
 $stmt->execute();
 $result = $stmt->get_result();
 

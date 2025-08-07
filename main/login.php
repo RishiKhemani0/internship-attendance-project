@@ -1,11 +1,29 @@
 <?php
+session_start();
 $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "attendance-db";
-$result = $emp_id = $password = $row = $first_name = $date = $time = $status = $company_id = "";
 
 date_default_timezone_set('Asia/Kolkata');
+
+// Check if a company ID is set in the session for the device
+if (!isset($_SESSION['company_id'])) {
+    // Redirect to login or device setup if the company is not identified
+    header('Location: company-login.php');
+    exit;
+}
+
+// Retrieve company ID from session
+$company_id_from_session = $_SESSION['company_id'];
+$emp_id = $_GET['emp_id'] ?? '';
+
+// Check if employee ID is provided and is not empty
+if (empty($emp_id)) {
+    // Redirect back to the index page if no employee ID is provided
+    header('Location: index.php');
+    exit;
+}
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -14,16 +32,20 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$emp_id = $_GET['emp_id'] ?? '';
-
-$sql = "SELECT first_name, company_id FROM employees where employee_id=$emp_id";
-$result = $conn->query($sql);
-
+// Use prepared statement to fetch employee details for the specific company
+$sql = "SELECT first_name, company_id FROM employees WHERE employee_id = ? AND company_id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("ii", $emp_id, $company_id_from_session);
+$stmt->execute();
+$result = $stmt->get_result();
 $row = $result->fetch_assoc();
 
 if ($row == null) {
+    // Employee not found or does not belong to the company
+    header('Location: index.php?error=employee_not_found');
     exit;
 }
+
 $first_name = $row["first_name"];
 $company_id = $row["company_id"];
 
@@ -32,35 +54,33 @@ $date = $current_datetime->format('Y-m-d');
 $time = $current_datetime->format('H:i:s');
 $datetime_string = $current_datetime->format('Y-m-d H:i:s');
 
-// Check for an existing attendance record with a NULL out_time
-$sql = "SELECT * FROM attendance where employee_id=$emp_id and out_time IS NULL";
-$result = $conn->query($sql);
-$row = $result->fetch_assoc();
+// Check for an existing attendance record with a NULL out_time for this employee and company
+$sql = "SELECT * FROM attendance WHERE employee_id = ? AND company_id = ? AND out_time IS NULL";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("ii", $emp_id, $company_id);
+$stmt->execute();
+$result = $stmt->get_result();
 
-$status = $time > "13:00:00" ? "late" : "on-time";
+$status_to_display = "";
 
 if ($result->num_rows == 0) {
     // No open shift found, so this is a Punch In
-    $sql = "INSERT INTO attendance(company_id, employee_id, shift_start_date, `status`, in_time, out_time) VALUES ('$company_id', '$emp_id', '$date', '$status', '$datetime_string', NULL)";
-    $status = "In";
+    $status = $time > "13:00:00" ? "late" : "on-time";
+    $sql = "INSERT INTO attendance(company_id, employee_id, shift_start_date, `status`, in_time, out_time) VALUES (?, ?, ?, ?, ?, NULL)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("issss", $company_id, $emp_id, $date, $status, $datetime_string);
+    $stmt->execute();
+    $status_to_display = "In";
 } else {
     // Open shift found, so this is a Punch Out
-    $sql = "UPDATE attendance
-    SET out_time = '$datetime_string'
-    WHERE employee_id = '$emp_id' AND out_time IS NULL;";
-    $status = "Out";
+    $sql = "UPDATE attendance SET out_time = ? WHERE employee_id = ? AND company_id = ? AND out_time IS NULL";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ssi", $datetime_string, $emp_id, $company_id);
+    $stmt->execute();
+    $status_to_display = "Out";
 }
 
-$conn->query($sql);
-
-function test_input($data)
-{
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return $data;
-}
-
+$stmt->close();
 $conn->close();
 ?>
 
@@ -92,12 +112,12 @@ $conn->close();
 </head>
 
 <body>
-    <h1>Punch - <?php echo $status ?> Successful</h1>
+    <h1>Punch - <?php echo htmlspecialchars($status_to_display); ?> Successful</h1>
     <img src="../images/Group 1.png" alt="Tick">
     <div>
-        <p>Employee Name : <?php echo $first_name ?></p>
-        <p>Employee ID : <?php echo $emp_id ?></p>
-        <p>Punch - <?php echo $status ?> Time : <?php echo $time ?></p>
+        <p>Employee Name : <?php echo htmlspecialchars($first_name); ?></p>
+        <p>Employee ID : <?php echo htmlspecialchars($emp_id); ?></p>
+        <p>Punch - <?php echo htmlspecialchars($status_to_display); ?> Time : <?php echo htmlspecialchars($time); ?></p>
     </div>
 
     <script>
