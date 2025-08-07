@@ -65,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     
     // The employee_id_counter is initialized to 0
     $initial_counter = 0;
-    $stmt->bind_param("sssiisi", $company_name, $email, $phone_num, $company_size, $company_type, $hashed_password, $initial_counter);
+    $stmt->bind_param("sssiisi", $company_name, $email, $phone_num, $company_size, $company_type, $pass_word, $initial_counter);
 
     if ($stmt->execute()) {
         $_SESSION['company_id'] = $stmt->insert_id;

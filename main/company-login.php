@@ -10,7 +10,7 @@ if (isset($_SESSION['company_id'])) {
 }
 
 $old_form_data = $_SESSION['old_form_data'] ?? null;
-$error_message = $_SESSION['error_message'] ?? null;
+$error_message = $_SESSION['login_error'] ?? null;
 $show_register_tab = isset($_GET['tab']) && $_GET['tab'] === 'register';
 
 // Clear session data after retrieving
