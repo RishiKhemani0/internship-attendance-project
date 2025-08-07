@@ -47,15 +47,63 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $role_id = $_POST["role"];
   $department_id = $_POST["department"];
   $gender = $_POST["gender"];
-  $password = $_POST["password"];
 
-  $stmt = $conn->prepare("INSERT INTO employees (first_name, middle_name, last_name, email, phone_num, birth_date, hire_date, salary, role, department_id, gender, password, company_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-  $stmt->bind_param("sssssssdiissi", $first_name, $middle_name, $last_name, $email, $phone_num, $birth_date, $hire_date, $salary, $role_id, $department_id, $gender, $password, $company_id);
+  // Check dates on the server side
+  $birthDateObj = new DateTime($birth_date);
+  $hireDateObj = new DateTime($hire_date);
+  $today = new DateTime();
+  $age = $birthDateObj->diff($today)->y;
 
-  if ($stmt->execute()) {
-    echo "<script>alert('Employee registered successfully');</script>";
-  } else {
-    echo "Error: " . $stmt->error;
+  if ($age < 18) {
+    echo "<script>alert('Employee must be at least 18 years old.'); window.history.back();</script>";
+    exit;
+  }
+
+  if ($hireDateObj > $today) {
+    echo "<script>alert('Hire date cannot be in the future.'); window.history.back();</script>";
+    exit;
+  }
+
+  if ($hireDateObj < $birthDateObj->modify('+18 years')) {
+    echo "<script>alert('Hire date must be at least 18 years after birth date.'); window.history.back();</script>";
+    exit;
+  }
+
+  // Begin a transaction to ensure atomicity
+  $conn->begin_transaction();
+
+  try {
+    // Get and increment the employee ID counter
+    $stmt_counter = $conn->prepare("SELECT employee_id_counter FROM companies WHERE id = ? FOR UPDATE");
+    $stmt_counter->bind_param("i", $company_id);
+    $stmt_counter->execute();
+    $result_counter = $stmt_counter->get_result();
+    $row_counter = $result_counter->fetch_assoc();
+    $new_employee_id = $row_counter['employee_id_counter'] + 1;
+    $stmt_counter->close();
+
+    // Insert new employee with the new ID
+    $stmt = $conn->prepare("INSERT INTO employees (employee_id, first_name, middle_name, last_name, email, phone_num, birth_date, hire_date, salary, role, department_id, gender, company_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("issssssiiisii", $new_employee_id, $first_name, $middle_name, $last_name, $email, $phone_num, $birth_date, $hire_date, $salary, $role_id, $department_id, $gender, $company_id);
+    if (!$stmt->execute()) {
+      throw new Exception("Error registering employee: " . $stmt->error);
+    }
+    $stmt->close();
+
+    // Update the counter
+    $stmt_update_counter = $conn->prepare("UPDATE companies SET employee_id_counter = ? WHERE id = ?");
+    $stmt_update_counter->bind_param("ii", $new_employee_id, $company_id);
+    if (!$stmt_update_counter->execute()) {
+      throw new Exception("Error updating employee ID counter: " . $stmt_update_counter->error);
+    }
+    $stmt_update_counter->close();
+
+    $conn->commit();
+    echo "<script>alert('Employee registered successfully with ID: {$new_employee_id}');</script>";
+
+  } catch (Exception $e) {
+    $conn->rollback();
+    echo "Error: " . $e->getMessage();
   }
 }
 ?>
@@ -75,6 +123,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       darkMode: 'class',
     };
   </script>
+  <style>
+    /*
+      This is a custom style to change the color of the date input selector icon
+      The color is changed based on the parent's `dark` class
+    */
+    .dark input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(1);
+    }
+  </style>
 </head>
 
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
@@ -139,7 +196,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       <div class="max-w-5xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h2 class="text-2xl font-bold text-center mb-2">Register Employee</h2>
         <p class="text-center text-gray-600 dark:text-gray-300 mb-6">Fill in the details below</p>
-        <form action="register.php" method="post" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <form action="register.php" method="post" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+          onsubmit="return validateDates()">
           <div>
             <label class="block mb-1">First Name</label>
             <input type="text" name="first_name"
@@ -173,13 +231,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
           <div>
             <label class="block mb-1">Birth Date</label>
-            <input type="date" name="birth_date"
+            <input type="date" name="birth_date" id="birth_date"
               class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
               required>
           </div>
           <div>
             <label class="block mb-1">Hire Date</label>
-            <input type="date" name="hire_date"
+            <input type="date" name="hire_date" id="hire_date"
               class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
               required>
           </div>
@@ -226,21 +284,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
               <option>Other</option>
             </select>
           </div>
-
-          <div>
-            <label class="block mb-1">Password</label>
-            <input type="password" name="password" id="password"
-              class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
-              required>
-          </div>
-
-          <div class="col-span-full">
-            <label class="inline-flex items-center">
-              <input type="checkbox" id="showPass" class="form-checkbox text-blue-600">
-              <span class="ml-2">Show Password</span>
-            </label>
-          </div>
-
           <div class="col-span-full text-center">
             <button type="submit"
               class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded">Register</button>
@@ -251,13 +294,40 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   </div>
 
   <script>
-    const checkShowBox = document.querySelector("#showPass");
-    const password = document.querySelector("#password");
-    checkShowBox.addEventListener('click', () => {
-      password.type = checkShowBox.checked ? "text" : "password";
-    });
-  </script>
-  <script>
+    function validateDates() {
+      const birthDateInput = document.getElementById('birth_date').value;
+      const hireDateInput = document.getElementById('hire_date').value;
+
+      const birthDate = new Date(birthDateInput);
+      const hireDate = new Date(hireDateInput);
+      const today = new Date();
+
+      const age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+
+      if (age < 18) {
+        alert("Employee must be at least 18 years old.");
+        return false;
+      }
+
+      if (hireDate > today) {
+        alert("Hire date cannot be in the future.");
+        return false;
+      }
+
+      const minHireDate = new Date(birthDate);
+      minHireDate.setFullYear(minHireDate.getFullYear() + 18);
+      if (hireDate < minHireDate) {
+        alert("Hire date must be at least 18 years after birth date.");
+        return false;
+      }
+
+      return true;
+    }
+
     function toggleTheme() {
       const isDark = document.documentElement.classList.toggle('dark');
       localStorage.setItem('theme', isDark ? 'dark' : 'light');

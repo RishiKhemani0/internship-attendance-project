@@ -42,6 +42,9 @@ $stmt_role->close();
 
 $conn->close();
 
+$error_message = $_SESSION['error_message'] ?? null;
+unset($_SESSION['error_message']);
+
 function getBadgeColor($text) {
     $colors = ['bg-blue-200 text-blue-800', 'bg-green-200 text-green-800', 'bg-yellow-200 text-yellow-800', 'bg-red-200 text-red-800'];
     $hash = crc32($text);
@@ -86,6 +89,12 @@ function getBadgeColor($text) {
     <div class='max-w-4xl mx-auto p-8'>
         <h1 class='text-3xl font-bold text-center mb-10'>Welcome to Attentify, <?= htmlspecialchars($_SESSION['company_name']) ?>!</h1>
         
+        <?php if ($error_message): ?>
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                <span class="block sm:inline"><?= htmlspecialchars($error_message) ?></span>
+            </div>
+        <?php endif; ?>
+
         <div class='bg-white dark:bg-gray-800 shadow rounded-lg p-6 mb-8'>
             <h2 class='text-2xl font-semibold mb-4'>Create Departments</h2>
             <form action='process_setup.php' method='post' class='flex gap-4 items-center'>
