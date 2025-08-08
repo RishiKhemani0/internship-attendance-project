@@ -86,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // Insert new employee with the new ID and password
     $stmt = $conn->prepare("INSERT INTO employees (employee_id, first_name, middle_name, last_name, email, phone_num, password, birth_date, hire_date, salary, pr_salary, role, department_id, gender, company_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("issssssssiidisii", $new_employee_id, $first_name, $middle_name, $last_name, $email, $phone_num, $password, $birth_date, $hire_date, $salary, $pr_salary, $role_id, $department_id, $gender, $company_id);
+    $stmt->bind_param("issssssssiisisi", $new_employee_id, $first_name, $middle_name, $last_name, $email, $phone_num, $password, $birth_date, $hire_date, $salary, $pr_salary, $role_id, $department_id, $gender, $company_id);
     if (!$stmt->execute()) {
       throw new Exception("Error registering employee: " . $stmt->error);
     }

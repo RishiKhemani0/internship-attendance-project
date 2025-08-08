@@ -163,7 +163,9 @@ $attendanceResult = $stmt->get_result();
             'Hire Date' => $employee['hire_date'],
             'Department' => $employee['dept_name'],
             'Role' => $employee['role_name'],
-            'Salary' => '₹' . number_format($employee['salary'], 2)
+            'Remaining Leaves' => $employee['leaves'],
+            'Salary' => '₹' . number_format($employee['salary'], 2),
+            'Prorated Salary' => '₹' . number_format($employee['pr_salary'], 2)
           ] as $label => $value) {
             echo "<div class='flex flex-col'><span class='font-semibold text-gray-500 dark:text-gray-400'>$label:</span><span class='font-medium'>$value</span></div>";
           }
@@ -223,16 +225,17 @@ $attendanceResult = $stmt->get_result();
             <?php
             if ($attendanceResult && $attendanceResult->num_rows > 0) {
                 while ($row = $attendanceResult->fetch_assoc()) {
-                  $in = new DateTime($row['in_time']);
-                  $out = $row['out_time'] ? new DateTime($row['out_time']) : new DateTime();
-                  $interval = $in->diff($out);
-                  $statusClass = $row['status'] === 'on-time' ? 'bg-green-500' : 'bg-orange-500';
-                  $out_time_display = $row['out_time'] ? (new DateTime($row['out_time']))->format('Y-m-d H:i:s') : "Not punched out";
-                  $working_hours = $row['out_time'] ? $interval->format('%h hr %i min') : 'Ongoing';
+                  $in = $row['in_time'] ? new DateTime($row['in_time']) : null;
+                  $out = $row['out_time'] ? new DateTime($row['out_time']) : null;
+                  $interval = $in && $out ? $in->diff($out) : null;
+                  $statusClass = $row['status'] === 'on-time' ? 'bg-green-500' : ($row['status'] === 'late' ? 'bg-orange-500' : 'bg-red-500');
+                  $in_time_display = $in ? $in->format('Y-m-d H:i:s') : 'N/A';
+                  $out_time_display = $out ? $out->format('Y-m-d H:i:s') : "Not punched out";
+                  $working_hours = $interval ? $interval->format('%h hr %i min') : 'N/A';
 
                   echo "<tr class='hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200'>";
                   echo "<td class='px-6 py-4'>" . htmlspecialchars((new DateTime($row["shift_start_date"]))->format('Y-m-d')) . "</td>";
-                  echo "<td class='px-6 py-4'><span class='inline-block w-3 h-3 rounded-full mr-2 $statusClass'></span>" . htmlspecialchars($in->format('Y-m-d H:i:s')) . "</td>";
+                  echo "<td class='px-6 py-4'><span class='inline-block w-3 h-3 rounded-full mr-2 $statusClass'></span>" . $in_time_display . "</td>";
                   echo "<td class='px-6 py-4'>" . $out_time_display . "</td>";
                   echo "<td class='px-6 py-4'>" . $working_hours . "</td>";
                   echo "</tr>";
