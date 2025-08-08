@@ -41,9 +41,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $last_name = $_POST["last_name"];
   $email = $_POST["email"];
   $phone_num = $_POST["phone_num"];
+  $password = $_POST["password"]; // Capture the password
   $birth_date = $_POST["birth_date"];
   $hire_date = $_POST["hire_date"];
   $salary = $_POST["salary"];
+  $pr_salary = $salary; // Set pr_salary to salary
   $role_id = $_POST["role"];
   $department_id = $_POST["department"];
   $gender = $_POST["gender"];
@@ -82,9 +84,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $new_employee_id = $row_counter['employee_id_counter'] + 1;
     $stmt_counter->close();
 
-    // Insert new employee with the new ID
-    $stmt = $conn->prepare("INSERT INTO employees (employee_id, first_name, middle_name, last_name, email, phone_num, birth_date, hire_date, salary, role, department_id, gender, company_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("issssssiiisii", $new_employee_id, $first_name, $middle_name, $last_name, $email, $phone_num, $birth_date, $hire_date, $salary, $role_id, $department_id, $gender, $company_id);
+    // Insert new employee with the new ID and password
+    $stmt = $conn->prepare("INSERT INTO employees (employee_id, first_name, middle_name, last_name, email, phone_num, password, birth_date, hire_date, salary, pr_salary, role, department_id, gender, company_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("issssssssiidisii", $new_employee_id, $first_name, $middle_name, $last_name, $email, $phone_num, $password, $birth_date, $hire_date, $salary, $pr_salary, $role_id, $department_id, $gender, $company_id);
     if (!$stmt->execute()) {
       throw new Exception("Error registering employee: " . $stmt->error);
     }
@@ -99,11 +101,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $stmt_update_counter->close();
 
     $conn->commit();
-    echo "<script>alert('Employee registered successfully with ID: {$new_employee_id}');</script>";
+    echo "<script>alert('Employee registered successfully with ID: {$new_employee_id}'); window.location.href='../dashboard.php';</script>";
 
   } catch (Exception $e) {
     $conn->rollback();
-    echo "Error: " . $e->getMessage();
+    // Check for duplicate entry error (error code 1062)
+    if ($conn->errno == 1062) {
+        echo "<script>alert('Error: An employee with this email or phone number already exists.'); window.history.back();</script>";
+    } else {
+        echo "<script>alert('Error: " . addslashes($e->getMessage()) . "'); window.history.back();</script>";
+    }
   }
 }
 ?>
@@ -124,10 +131,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     };
   </script>
   <style>
-    /*
-      This is a custom style to change the color of the date input selector icon
-      The color is changed based on the parent's `dark` class
-    */
     .dark input[type="date"]::-webkit-calendar-picker-indicator {
       filter: invert(1);
     }
@@ -219,15 +222,29 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
           <div>
             <label class="block mb-1">Email</label>
             <input type="email" name="email"
-              class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 invalid:border-pink-500 invalid:text-pink-600 focus:border-sky-500 focus:outline focus:outline-sky-500 focus:invalid:border-pink-500 focus:invalid:outline-pink-500"
+              class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
               required>
           </div>
           <div>
             <label class="block mb-1">Phone Number</label>
             <input type="tel" name="phone_num"
-              class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 invalid:border-pink-500 invalid:text-pink-600 focus:border-sky-500 focus:outline focus:outline-sky-500 focus:invalid:border-pink-500 focus:invalid:outline-pink-500"
+              class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
               required>
           </div>
+            <div>
+              <label class="block mb-1">Password</label>
+                <div class="relative">
+                  <input type="password" name="password" id="password"
+                    class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+                    required>
+                  <div class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
+                    <input type="checkbox" id="toggle" class="hidden" onchange="togglePasswordVisibility()"/>
+                    <label for="toggle" class="text-gray-500 dark:text-gray-400 cursor-pointer">
+                      <i class="far fa-eye" id="toggle-icon"></i>
+                    </label>
+                  </div>
+              </div>
+            </div>
 
           <div>
             <label class="block mb-1">Birth Date</label>
@@ -245,7 +262,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
           <div>
             <label class="block mb-1">Salary</label>
             <input type="number" name="salary"
-              class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 invalid:border-pink-500 invalid:text-pink-600 focus:border-sky-500 focus:outline focus:outline-sky-500 focus:invalid:border-pink-500 focus:invalid:outline-pink-500"
+              class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
               required>
           </div>
 
@@ -294,15 +311,31 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   </div>
 
   <script>
+    function togglePasswordVisibility() {
+      const passwordInput = document.getElementById('password');
+      const toggleIcon = document.getElementById('toggle-icon');
+      const isPassword = passwordInput.type === 'password';
+      passwordInput.type = isPassword ? 'text' : 'password';
+      toggleIcon.classList.toggle('fa-eye');
+      toggleIcon.classList.toggle('fa-eye-slash');
+    }
+
     function validateDates() {
       const birthDateInput = document.getElementById('birth_date').value;
       const hireDateInput = document.getElementById('hire_date').value;
 
+      if (!birthDateInput || !hireDateInput) {
+          alert("Please enter both birth date and hire date.");
+          return false;
+      }
+
       const birthDate = new Date(birthDateInput);
       const hireDate = new Date(hireDateInput);
       const today = new Date();
+      today.setHours(0, 0, 0, 0); // Remove time part for accurate comparison
 
-      const age = today.getFullYear() - birthDate.getFullYear();
+      // Calculate age
+      let age = today.getFullYear() - birthDate.getFullYear();
       const m = today.getMonth() - birthDate.getMonth();
       if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
         age--;
@@ -321,7 +354,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       const minHireDate = new Date(birthDate);
       minHireDate.setFullYear(minHireDate.getFullYear() + 18);
       if (hireDate < minHireDate) {
-        alert("Hire date must be at least 18 years after birth date.");
+        alert("Hire date must be at least 18 years after the employee's birth date.");
         return false;
       }
 

@@ -202,6 +202,7 @@ $attendanceResult = $stmt->get_result();
             </select>
           </div>
           <div class="flex gap-2">
+            <a href="export_excel.php" class="w-full bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition">Export</a>
             <button type="submit" class="w-full bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition">Apply</button>
             <a href="table.php?employee_id=<?= $employee_id ?>" class="w-full bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white px-4 py-2 rounded-xl text-center hover:bg-gray-300 dark:hover:bg-gray-600 transition">Reset</a>
           </div>

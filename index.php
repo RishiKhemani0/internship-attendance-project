@@ -43,7 +43,7 @@ if (isset($_SESSION['company_id'])) {
         }
 
         .container {
-            width: 80% !important;
+            width: 60% !important;
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
@@ -92,11 +92,11 @@ if (isset($_SESSION['company_id'])) {
                 style="animation-delay: 0.4s;">
                 <a href="./main/company-login.php"
                     class="bg-white text-indigo-600 font-semibold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl hover:bg-gray-100 transition-all duration-300">
-                    Start Your Free Trial
+                    Admin Login
                 </a>
-                <a href="#features"
+                <a href="./main/employee_login.php"
                     class="bg-transparent border border-white text-white font-semibold py-3 px-8 rounded-lg hover:bg-white hover:text-indigo-600 transition-all duration-300">
-                    Learn More
+                    Employee Login
                 </a>
             </div>
         </div>

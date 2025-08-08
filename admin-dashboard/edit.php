@@ -59,28 +59,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $last_name = $_POST["last_name"];
   $email = $_POST["email"];
   $phone_num = $_POST["phone_num"];
+  $password = $_POST["password"];
   $birth_date = $_POST["birth_date"];
   $hire_date = $_POST["hire_date"];
   $salary = $_POST["salary"];
   $role_id = $_POST["role"];
   $department_id = $_POST["department"];
   $gender = $_POST["gender"];
-  $password = $_POST["password"];
 
-  $stmt = $conn->prepare("UPDATE employees SET first_name=?, middle_name=?, last_name=?, email=?, phone_num=?, birth_date=?, hire_date=?, salary=?, role=?, department_id=?, gender=?, password=? WHERE employee_id=? AND company_id=?");
-  $stmt->bind_param("sssssssdiissi", 
+  $stmt = $conn->prepare("UPDATE employees SET first_name=?, middle_name=?, last_name=?, email=?, phone_num=?, password=?, birth_date=?, hire_date=?, salary=?, role=?, department_id=?, gender=? WHERE employee_id=? AND company_id=?");
+  $stmt->bind_param("ssssssssdiisii", 
   $first_name,
   $middle_name,
   $last_name,
   $email,
   $phone_num,
+  $password,
   $birth_date,
   $hire_date,
   $salary,
   $role_id,
   $department_id,
   $gender,
-  $password,
   $employee_id,
   $company_id
 );
@@ -193,6 +193,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 class="w-full px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring focus:ring-blue-500">
             </div>
           </div>
+          
+          <div class="w-full">
+            <label class="block text-sm font-medium mb-1">Password</label>
+              <div class="relative">
+                <input type="password" name="password" id="password" value="<?= htmlspecialchars($employee['password']) ?>"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring focus:ring-blue-500">
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
+                    <input type="checkbox" id="toggle" class="hidden" onchange="togglePasswordVisibility()"/>
+                    <label for="toggle" class="text-gray-500 dark:text-gray-400 cursor-pointer">
+                        <i class="far fa-eye" id="toggle-icon"></i>
+                    </label>
+                </div>
+              </div>
+          </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -263,6 +277,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
   <script>
+    function togglePasswordVisibility() {
+      const passwordInput = document.getElementById('password');
+      const toggleIcon = document.getElementById('toggle-icon');
+      const isPassword = passwordInput.type === 'password';
+      passwordInput.type = isPassword ? 'text' : 'password';
+      toggleIcon.classList.toggle('fa-eye');
+      toggleIcon.classList.toggle('fa-eye-slash');
+    }
+    
     function toggleTheme() {
       const isDark = document.documentElement.classList.toggle('dark');
       localStorage.setItem('theme', isDark ? 'dark' : 'light');
