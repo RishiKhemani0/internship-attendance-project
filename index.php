@@ -52,7 +52,7 @@ if (isset($_SESSION['company_id'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css"
         integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
-        <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="/manifest.json">
 </head>
 
 <body class="bg-gray-50 text-gray-800 font-sans ">
@@ -65,14 +65,16 @@ if (isset($_SESSION['company_id'])) {
                     class="text-gray-600 hover:text-indigo-600 transition-colors duration-300">Features</a>
                 <a href="#testimonials"
                     class="text-gray-600 hover:text-indigo-600 transition-colors duration-300">Testimonials</a>
-                <a href="#pricing" class="text-gray-600 hover:text-indigo-600 transition-colors duration-300">Pricing</a>
-                <a href="#contact" class="text-gray-600 hover:text-indigo-600 transition-colors duration-300">Contact</a>
+                <a href="#pricing"
+                    class="text-gray-600 hover:text-indigo-600 transition-colors duration-300">Pricing</a>
+                <a href="#contact"
+                    class="text-gray-600 hover:text-indigo-600 transition-colors duration-300">Contact</a>
             </div>
             <div class="flex items-center space-x-4">
-                <a href="./main/company-login.php"
+                <a href="./main/selection.html"
                     class="text-gray-600 hover:text-indigo-600 transition-colors duration-300 hidden md:block">Log
                     In</a>
-                <a href="./main/company-login.php"
+                <a href="./main/selection.html"
                     class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
                     Get Started
                 </a>
@@ -91,13 +93,9 @@ if (isset($_SESSION['company_id'])) {
             </p>
             <div class="space-y-4 sm:space-y-0 sm:space-x-4 flex flex-col sm:flex-row justify-center animate-fadeIn"
                 style="animation-delay: 0.4s;">
-                <a href="./main/company-login.php"
+                <a href="./main/selection.html"
                     class="bg-white text-indigo-600 font-semibold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl hover:bg-gray-100 transition-all duration-300">
-                    Admin Login
-                </a>
-                <a href="./main/employee_login.php"
-                    class="bg-transparent border border-white text-white font-semibold py-3 px-8 rounded-lg hover:bg-white hover:text-indigo-600 transition-all duration-300">
-                    Employee Login
+                    Try Now
                 </a>
             </div>
         </div>
@@ -228,7 +226,7 @@ if (isset($_SESSION['company_id'])) {
             <p class="text-lg md:text-xl max-w-2xl mx-auto mb-8 opacity-90">
                 Join thousands of organizations who trust Attentify to manage their attendance effortlessly.
             </p>
-            <a href="./main/company-login.php"
+            <a href="./main/selection.html"
                 class="bg-white text-indigo-600 font-semibold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl hover:bg-gray-100 transition-all duration-300">
                 Get Started for Free
             </a>

@@ -19,7 +19,7 @@ session_start();
     <nav class='bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-md px-6 py-4 w-full fixed'>
         <div class='max-w-full flex justify-between items-center'>
             <div class='flex items-center space-x-3'>
-                <img src='../images/transparent-logo.png' alt='Logo' class='w-8 h-8' />
+                <a href="../index.php"><img src='../images/transparent-logo.png' alt='Logo' class='w-8 h-8' /></a>
                 <span class='text-xl font-semibold text-gray-800 dark:text-white'>Attentify</span>
             </div>
         </div>

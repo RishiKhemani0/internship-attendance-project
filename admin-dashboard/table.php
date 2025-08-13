@@ -201,6 +201,7 @@ $attendanceResult = $stmt->get_result();
               <option value="">All</option>
               <option value="on-time" <?= $status == 'on-time' ? 'selected' : '' ?>>On-Time</option>
               <option value="late" <?= $status == 'late' ? 'selected' : '' ?>>Late</option>
+              <option value="absent" <?= $status == 'absent' ? 'selected' : '' ?>>Absent</option>
             </select>
           </div>
           <div class="flex gap-2">
@@ -228,7 +229,16 @@ $attendanceResult = $stmt->get_result();
                   $in = $row['in_time'] ? new DateTime($row['in_time']) : null;
                   $out = $row['out_time'] ? new DateTime($row['out_time']) : null;
                   $interval = $in && $out ? $in->diff($out) : null;
-                  $statusClass = $row['status'] === 'on-time' ? 'bg-green-500' : ($row['status'] === 'late' ? 'bg-orange-500' : 'bg-red-500');
+                  
+                  $statusClass = '';
+                  if ($row['status'] === 'on-time') {
+                      $statusClass = 'bg-green-500';
+                  } elseif ($row['status'] === 'late') {
+                      $statusClass = 'bg-orange-500';
+                  } elseif ($row['status'] === 'absent') {
+                      $statusClass = 'bg-red-500';
+                  }
+
                   $in_time_display = $in ? $in->format('Y-m-d H:i:s') : 'N/A';
                   $out_time_display = $out ? $out->format('Y-m-d H:i:s') : "Not punched out";
                   $working_hours = $interval ? $interval->format('%h hr %i min') : 'N/A';
